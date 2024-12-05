@@ -4,8 +4,8 @@ import uvicorn
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
-#from bot import run_bot
-from bot2 import main
+from bot import run_bot
+#from bot2 import main
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
