@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 #from bot import run_bot
 #from bot2 import main
-from bot3 import main
+from bot3 import run_sales_bot
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -30,7 +30,8 @@ async def websocket_endpoint(websocket: WebSocket):
     print(call_data, flush=True)
     stream_sid = call_data["start"]["streamSid"]
     print("WebSocket connection accepted")
-    await run_bot(websocket, stream_sid)
+    #await run_bot(websocket, stream_sid)
+    await run_sales_bot(websocket, stream_sid)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8765))
