@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 from bot import run_bot
 #from bot2 import main
-from bot3 import run_sales_bot
+#from bot3 import run_sales_bot
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
