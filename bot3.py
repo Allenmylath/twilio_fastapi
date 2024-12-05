@@ -140,7 +140,180 @@ flow_config = {
                 },
             ],
         },
-        # ... rest of your flow_config nodes remain the same ...
+        "present_value_prop": {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """
+                    Present the value proposition while maintaining your established rapport.
+                    Continue matching the prospect's communication style and using their terminology.
+                    
+                    Core message: Explain how we help companies like [prospect's company] overcome [challenges] 
+                    and drive predictable revenue growth opportunities.
+
+                    Remember to:
+                    - Use any industry terms or phrases they've mentioned
+                    - Match their level of technical detail
+                    - Maintain their preferred pace of conversation
+                    - Focus on aspects they've shown interest in
+                    """,
+                }
+            ],
+            "functions": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "record_interest",
+                        "handler": record_interest,
+                        "description": "Record if the prospect is interested",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "is_interested": {
+                                    "type": "boolean",
+                                    "description": "Whether the prospect shows interest",
+                                }
+                            },
+                            "required": ["is_interested"],
+                        },
+                    },
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "schedule_demo",
+                        "description": "Move to scheduling a demo",
+                        "parameters": {"type": "object", "properties": {}},
+                    },
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "handle_rejection",
+                        "description": "Handle prospect's lack of interest",
+                        "parameters": {"type": "object", "properties": {}},
+                    },
+                },
+            ],
+        },
+        "schedule_demo": {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """
+                    Attempt to schedule a demo while maintaining the prospect's preferred communication style.
+                    
+                    Core goal: Schedule a 15-minute demo call with the senior sales lead.
+
+                    Adapt your approach based on their style:
+                    - If they're direct, be straightforward about scheduling
+                    - If they're more reserved, take a softer approach
+                    - Use time-related phrases they've used (e.g., "touch base", "sync up", "meet")
+                    - Match their level of urgency
+                    """,
+                }
+            ],
+            "functions": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "schedule_meeting",
+                        "handler": schedule_meeting,
+                        "description": "Schedule a demo meeting",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "meeting_details": {
+                                    "type": "object",
+                                    "properties": {
+                                        "scheduled": {"type": "boolean"},
+                                        "date": {"type": "string"},
+                                        "time": {"type": "string"},
+                                    },
+                                    "required": ["scheduled", "date", "time"],
+                                }
+                            },
+                            "required": ["meeting_details"],
+                        },
+                    },
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "end_call_success",
+                        "description": "End call after successful scheduling",
+                        "parameters": {"type": "object", "properties": {}},
+                    },
+                },
+            ],
+        },
+        "handle_rejection": {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """
+                    Handle rejection professionally while maintaining the established communication style.
+                    
+                    Ask if you can send a product introductory email for their future reference.
+                    Match their style of declining/deferring and mirror their level of directness.
+                    """,
+                }
+            ],
+            "functions": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "record_email_followup",
+                        "handler": record_email_followup,
+                        "description": "Record if prospect wants email followup",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "wants_email": {
+                                    "type": "boolean",
+                                    "description": "Whether prospect wants email followup",
+                                }
+                            },
+                            "required": ["wants_email"],
+                        },
+                    },
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "end_call_followup",
+                        "description": "End call with email followup",
+                        "parameters": {"type": "object", "properties": {}},
+                    },
+                },
+            ],
+        },
+        "end_call_success": {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """
+                    End the call positively while maintaining the established rapport.
+                    Thank them using their preferred communication style and reference the scheduled demo.
+                    """,
+                }
+            ],
+            "functions": [],
+            "post_actions": [{"type": "end_conversation"}],
+        },
+        "end_call_followup": {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """
+                    End the call professionally while maintaining their communication style.
+                    Thank them appropriately and confirm the email followup using their preferred terms.
+                    """,
+                }
+            ],
+            "functions": [],
+            "post_actions": [{"type": "end_conversation"}],
+        },
     },
 }
 
