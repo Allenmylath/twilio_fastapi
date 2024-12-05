@@ -3,4 +3,4 @@ fastapi
 uvicorn
 python-dotenv
 loguru
-pipecat-ai-flows[daily,cartesia,openai,silero,deepgram]
+#pipecat-ai-flows[daily,cartesia,openai,silero,deepgram]
