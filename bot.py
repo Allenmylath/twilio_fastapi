@@ -15,6 +15,7 @@ from pipecat.transports.network.fastapi_websocket import (
     FastAPIWebsocketParams,
 )
 from pipecat.serializers.twilio import TwilioFrameSerializer
+from pipecat.audio.filters.krisp_filter import KrispFilter
 
 from loguru import logger
 
