@@ -15,7 +15,7 @@ from pipecat.transports.network.fastapi_websocket import (
     FastAPIWebsocketParams,
 )
 from pipecat.serializers.twilio import TwilioFrameSerializer
-from pipecat.audio.filters.krisp_filter import KrispFilter
+from pipecat.audio.filters.noisereduce_filter import NoisereduceFilter
 
 from loguru import logger
 
@@ -37,7 +37,7 @@ async def run_bot(websocket_client, stream_sid):
             vad_analyzer=SileroVADAnalyzer(),
             vad_audio_passthrough=True,
             serializer=TwilioFrameSerializer(stream_sid),
-            audio_in_filter=KrispFilter(),
+            audio_in_filter=NoisereduceFilter(),
         ),
     )
 
