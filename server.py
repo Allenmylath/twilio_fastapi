@@ -1,33 +1,22 @@
 import json
 import os
 import uvicorn
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 from fastapi.exceptions import HTTPException
 import asyncio
-from bot import run_bot
-import signal
 
 app = FastAPI()
-
-# Track active connections
-active_connections = set()
+is_ready = False
 
 @app.on_event("startup")
 async def startup_event():
-    print("Application startup...")
-    # Initialize any resources needed
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    print("Application shutdown...")
-    # Close all active connections
-    for connection in active_connections:
-        try:
-            await connection.close(code=1000)
-        except:
-            pass
+    global is_ready
+    # Add small delay to ensure all workers are ready
+    await asyncio.sleep(2)
+    is_ready = True
+    print("Server is ready to accept connections")
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,88 +28,63 @@ app.add_middleware(
 
 @app.post("/")
 async def start_call():
-    try:
-        print("POST TwiML")
-        # Simplified TwiML with minimal response time
-        twiml = """<?xml version="1.0" encoding="UTF-8"?>
+    global is_ready
+    if not is_ready:
+        # Return 503 if server isn't ready, which will trigger Twilio to retry
+        return Response(status_code=503)
+        
+    print("POST TwiML")
+    twiml = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Connect>
         <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws"/>
     </Connect>
 </Response>"""
-        return HTMLResponse(
-            content=twiml,
-            media_type="application/xml",
-            headers={
-                "Connection": "close"  # Changed to close to prevent hanging connections
-            }
-        )
-    except Exception as e:
-        print(f"Error in start_call: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return HTMLResponse(content=twiml, media_type="application/xml")
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    try:
-        await websocket.accept()
-        active_connections.add(websocket)
-        print("WebSocket connection initiated")
+    if not is_ready:
+        await websocket.close(code=1013)  # 1013 = Try again later
+        return
         
-        try:
-            start_data = websocket.iter_text()
-            async with asyncio.timeout(5):
-                initial_message = await start_data.__anext__()
-                print(f"Initial WebSocket message received: {initial_message}")
-                call_data = json.loads(await start_data.__anext__())
-                print(f"Call data received: {call_data}")
-        except asyncio.TimeoutError:
-            print("WebSocket connection timed out")
-            active_connections.remove(websocket)
-            await websocket.close(code=1000)
-            return
-            
+    await websocket.accept()
+    print("WebSocket connection initiated")
+    
+    try:
+        start_data = websocket.iter_text()
+        initial_message = await start_data.__anext__()
+        print(f"Initial WebSocket message received: {initial_message}")
+        call_data = json.loads(await start_data.__anext__())
+        print(f"Call data received: {call_data}")
+        
         stream_sid = call_data["start"]["streamSid"]
         print(f"Stream SID: {stream_sid}")
         
-        try:
-            await run_bot(websocket, stream_sid)
-        except Exception as e:
-            print(f"Error in run_bot: {str(e)}")
+        await run_bot(websocket, stream_sid)
+        
     except Exception as e:
         print(f"WebSocket error: {str(e)}")
-    finally:
-        if websocket in active_connections:
-            active_connections.remove(websocket)
         try:
-            await websocket.close(code=1000)
+            await websocket.close(code=1011)
         except:
             pass
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 36331))  # Using the port Heroku assigned
+    port = int(os.getenv("PORT", 36331))
     
-    # Configure uvicorn with optimized settings for Heroku
+    # Configure uvicorn with startup timeout
     config = uvicorn.Config(
         "server:app",
         host="0.0.0.0",
         port=port,
-        workers=1,  # Single worker to avoid connection issues
-        loop="auto",
+        workers=1,
+        loop="asyncio",
+        timeout_keep_alive=65,
         limit_concurrency=50,
-        timeout_keep_alive=30,
-        access_log=True,
-        log_level="info"
+        # Add startup timeout
+        timeout_startup=30
     )
     
     server = uvicorn.Server(config)
-    
-    # Handle shutdown gracefully
-    def handle_signal(signum, frame):
-        print(f"Received signal {signum}")
-        asyncio.get_event_loop().stop()
-    
-    signal.signal(signal.SIGTERM, handle_signal)
-    signal.signal(signal.SIGINT, handle_signal)
-    
-    # Run the server
     server.run()
