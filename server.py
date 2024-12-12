@@ -21,17 +21,18 @@ app.add_middleware(
 async def start_call():
     try:
         print("POST TwiML")
+        # Simplified TwiML with Pause before Stream
         twiml = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say>Please wait while we connect you.</Say>
-    <Play loop="1">https://api.twilio.com/cowbell.mp3</Play>
+    <Pause length="1"/>
     <Connect>
-        <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws">
-            <Parameter name="timeout" value="10"/>
-        </Stream>
+        <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws"/>
     </Connect>
 </Response>"""
-        return HTMLResponse(content=twiml, media_type="application/xml")
+        return HTMLResponse(content=twiml, media_type="application/xml", headers={
+            "Connection": "keep-alive",
+            "Keep-Alive": "timeout=5, max=1000"
+        })
     except Exception as e:
         print(f"Error in start_call: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -40,21 +41,22 @@ async def start_call():
 async def websocket_endpoint(websocket: WebSocket):
     try:
         await websocket.accept()
+        print("WebSocket connection initiated")
         
-        # Set a timeout for initial connection
         try:
             start_data = websocket.iter_text()
-            async with asyncio.timeout(10):  # 10 second timeout
-                await start_data.__anext__()
+            async with asyncio.timeout(5):  # Reduced timeout
+                initial_message = await start_data.__anext__()
+                print(f"Initial WebSocket message received: {initial_message}")
                 call_data = json.loads(await start_data.__anext__())
+                print(f"Call data received: {call_data}")
         except asyncio.TimeoutError:
             print("WebSocket connection timed out")
             await websocket.close(code=1000)
             return
             
-        print(call_data, flush=True)
         stream_sid = call_data["start"]["streamSid"]
-        print("WebSocket connection accepted")
+        print(f"Stream SID: {stream_sid}")
         
         try:
             await run_bot(websocket, stream_sid)
@@ -77,7 +79,7 @@ if __name__ == "__main__":
         host="0.0.0.0", 
         port=port, 
         workers=workers,
-        timeout_keep_alive=30,
-        timeout_notify=30,
-        limit_concurrency=100
+        timeout_keep_alive=65,
+        limit_concurrency=50,
+        backlog=2048
     )
