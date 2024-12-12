@@ -4,10 +4,9 @@ import uvicorn
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
-from bot import run_bot
-#from bot2 import main
-#from bot3 import run_sales_bot
+
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,7 +18,15 @@ app.add_middleware(
 @app.post("/")
 async def start_call():
     print("POST TwiML")
-    return HTMLResponse(content=open("templates/streams.xml").read(), media_type="application/xml")
+    # TwiML response with hold music
+    twiml = """<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Play loop="0">https://api.twilio.com/cowbell.mp3</Play>
+    <Connect>
+        <Stream url="wss://{YOUR_SERVER_URL}/ws" />
+    </Connect>
+</Response>"""
+    return HTMLResponse(content=twiml, media_type="application/xml")
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -35,4 +42,5 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8765))
+    workers = int(os.getenv("WEB_CONCURRENCY", 1))
     uvicorn.run("server:app", host="0.0.0.0", port=port, workers=workers)
