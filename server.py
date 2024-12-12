@@ -23,7 +23,7 @@ async def start_call():
 <Response>
     <Play loop="0">https://api.twilio.com/cowbell.mp3</Play>
     <Connect>
-        <Stream url="wss://{YOUR_SERVER_URL}/ws" />
+        <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws" />
     </Connect>
 </Response>"""
     return HTMLResponse(content=twiml, media_type="application/xml")
