@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 from fastapi.exceptions import HTTPException
 import asyncio
+from bot import run_bot  # Added this import
 
 app = FastAPI()
 
@@ -21,7 +22,6 @@ app.add_middleware(
 async def start_call():
     try:
         print("POST TwiML")
-        # Simplified TwiML with Pause before Stream
         twiml = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Pause length="1"/>
@@ -45,7 +45,7 @@ async def websocket_endpoint(websocket: WebSocket):
         
         try:
             start_data = websocket.iter_text()
-            async with asyncio.timeout(5):  # Reduced timeout
+            async with asyncio.timeout(5):
                 initial_message = await start_data.__anext__()
                 print(f"Initial WebSocket message received: {initial_message}")
                 call_data = json.loads(await start_data.__anext__())
