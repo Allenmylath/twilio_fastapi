@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
-    <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws"></Stream>
+    <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws">
+      <Parameter name="timeout" value="60"/>
+    </Stream>
   </Connect>
-  <Pause length="40"/>
+  <Pause length="90"/>
 </Response>
