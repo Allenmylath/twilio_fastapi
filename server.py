@@ -1,15 +1,16 @@
 import json
 import uvicorn
 from bot import run_bot
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
+import asyncio
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for testing
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -18,7 +19,14 @@ app.add_middleware(
 @app.post("/")
 async def start_call():
     print("POST TwiML")
-    return HTMLResponse(content=open("templates/streams.xml").read(), media_type="application/xml")
+    response = HTMLResponse(
+        content=open("templates/streams.xml").read(),
+        media_type="application/xml"
+    )
+    # Add headers to prevent premature connection close
+    response.headers["Connection"] = "keep-alive"
+    response.headers["Keep-Alive"] = "timeout=60"
+    return response
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -26,13 +34,17 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.accept()
         print("WebSocket connection initiated")
         
-        # Handle initial connection data
+        # Add a small delay to ensure stable connection
+        await asyncio.sleep(0.5)
+        
         try:
             start_data = websocket.iter_text()
             initial_message = await start_data.__anext__()
             print(f"Initial connection message received: {initial_message}", flush=True)
             
-            # Get stream data
+            # Add small delay between messages
+            await asyncio.sleep(0.5)
+            
             stream_message = await start_data.__anext__()
             call_data = json.loads(stream_message)
             print("Stream data received:", call_data, flush=True)
@@ -47,6 +59,7 @@ async def websocket_endpoint(websocket: WebSocket):
             
         except StopAsyncIteration:
             print("Stream iteration ended")
+            await asyncio.sleep(1)  # Give time for cleanup
         except json.JSONDecodeError as e:
             print(f"JSON decode error: {e}")
         except Exception as e:
@@ -58,6 +71,8 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket error: {e}")
     finally:
         try:
+            # Add delay before closing
+            await asyncio.sleep(0.5)
             await websocket.close()
         except:
             pass
@@ -69,5 +84,6 @@ if __name__ == "__main__":
         host="0.0.0.0", 
         port=8765,
         log_level="info",
-        timeout_keep_alive=65  # Increased keep-alive timeout
+        timeout_keep_alive=65,
+        keepalive=65
     )
