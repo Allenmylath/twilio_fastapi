@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/")
+@app.get("/")
 async def handle_incoming_call():
     """
     Handle incoming calls using Twilio Python client
