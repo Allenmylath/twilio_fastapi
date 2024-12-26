@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <!-- Play ringing sound while establishing connection -->
-    <Play>
+    <!-- Play ringing sound -->
+    <Play loop="0">
         <Ringtone>at</Ringtone>
     </Play>
+    <!-- Add a small delay to ensure server is ready -->
+    <Pause length="2"/>
     <Connect>
         <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws">
             <Parameter name="timeout" value="60"/>
+            <!-- Add maxDuration to prevent very long connections -->
+            <Parameter name="maxDuration" value="14400"/>
         </Stream>
     </Connect>
+    <!-- Fallback in case of connection failure -->
+    <Say>Please wait while we connect your call.</Say>
 </Response>
