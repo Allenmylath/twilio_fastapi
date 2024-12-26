@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial>
-        <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws">
+    <Start>
+        <Stream url="wss://pipebot-twilio-051d2942e0ab.herokuapp.com/ws" track="both_tracks">
             <Parameter name="timeout" value="60"/>
             <Parameter name="maxDuration" value="14400"/>
         </Stream>
-    </Dial>
+    </Start>
+    <Pause length="14400"/>
 </Response>
