@@ -23,6 +23,8 @@ from dotenv import load_dotenv
 
 from pdfreader import read_pdf
 
+from send_email import send_email
+
 load_dotenv(override=True)
 
 logger.remove(0)
@@ -110,7 +112,17 @@ async def run_bot(websocket_client, stream_sid):
 
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
-        json_string = context_aggregator.context.get_messages_json()
+        messages = context_aggregator.context.get_messages()
+        readable_conversation = "\n\n".join([
+            f"Role: {msg['role']}\nMessage: {msg['content']}"
+            for msg in messages
+        ])
+    
+        send_email(
+            recipient_email="your-email@example.com",
+            subject="Conversation Transcript",
+            message_text=readable_conversation
+        )
         await task.queue_frames([EndFrame()])
         
         
