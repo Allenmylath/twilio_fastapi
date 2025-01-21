@@ -21,6 +21,8 @@ from loguru import logger
 
 from dotenv import load_dotenv
 
+from pdfreader import read_pdf
+
 load_dotenv(override=True)
 
 logger.remove(0)
