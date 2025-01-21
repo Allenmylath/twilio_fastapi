@@ -51,6 +51,8 @@ async def run_bot(websocket_client, stream_sid):
         api_key=os.getenv("CARTESIA_API_KEY"),
         voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
     )
+    text = read_pdf("25 questions and responses for Jessica.pdf")
+
 
     messages = [
     {
@@ -76,7 +78,8 @@ async def run_bot(websocket_client, stream_sid):
             "When medical questions arise, gracefully transition to arranging contact with a human healthcare provider. "
             
             "Always remember your responses will be converted to audio, so maintain clear, natural speech patterns "
-            "and AVOID TECHNICAL FORMATING AND SPECIAL CHARACTERS."
+            "and AVOID TECHNICAL FORMATING AND SPECIAL CHARACTERS.\n\n"
+            + text
                    )
     }
     ]
