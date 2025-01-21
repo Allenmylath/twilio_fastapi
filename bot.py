@@ -119,7 +119,7 @@ async def run_bot(websocket_client, stream_sid):
         ])
     
         send_email(
-            recipient_email="your-email@example.com",
+            recipient_email="allengeorge@dataastra.io",
             subject="Conversation Transcript",
             message_text=readable_conversation
         )
