@@ -36,10 +36,4 @@ def read_pdf(file_path):
     except Exception as e:
         raise Exception(f"An unexpected error occurred: {str(e)}")
 
-# Example usage:
-if __name__ == "__main__":
-    try:
-        pdf_text = read_pdf("25 questions and responses for Jessica.pdf")
-        print(pdf_text)
-    except Exception as e:
-        print(f"Error: {str(e)}")
+
