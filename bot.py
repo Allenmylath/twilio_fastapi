@@ -110,8 +110,10 @@ async def run_bot(websocket_client, stream_sid):
 
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
+        json_string = context_aggregator.context.get_messages_json()
         await task.queue_frames([EndFrame()])
-
+        
+        
     runner = PipelineRunner(handle_sigint=False)
 
     await runner.run(task)
