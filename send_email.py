@@ -53,20 +53,4 @@ def send_email(recipient_email, subject, message_text):
         print(f"Error sending email: {str(e)}")
         return False
 
-# Example usage:
-if __name__ == "__main__":
-    # Test the function
-    recipient = "recipient@example.com"
-    subject = "Test Email"
-    message = "This is a test email sent from Python."
-    
-    success = send_email(
-        recipient_email=recipient,
-        subject=subject,
-        message_text=message
-    )
-    
-    if success:
-        print("Email sent successfully!")
-    else:
-        print("Failed to send email.")
+
