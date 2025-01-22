@@ -53,7 +53,7 @@ async def run_bot(websocket_client, stream_sid):
         api_key=os.getenv("CARTESIA_API_KEY"),
         voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
     )
-    text = read_pdf("25 questions and responses for Jessica.pdf")
+    #text = read_pdf("25 questions and responses for Jessica.pdf")
 
 
     messages = [
