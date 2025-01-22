@@ -112,6 +112,7 @@ async def run_bot(websocket_client, stream_sid):
 
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
+        '''
         messages = context_aggregator.context.get_messages()
         readable_conversation = "\n\n".join([
             f"Role: {msg['role']}\nMessage: {msg['content']}"
@@ -123,6 +124,7 @@ async def run_bot(websocket_client, stream_sid):
             subject="Conversation Transcript",
             message_text=readable_conversation
         )
+        '''
         await task.queue_frames([EndFrame()])
         
         
