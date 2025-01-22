@@ -44,7 +44,7 @@ async def run_bot(websocket_client, stream_sid):
         params=FastAPIWebsocketParams(
             audio_out_enabled=True,
             add_wav_header=False,
-            vad_enabled=True,
+            #vad_enabled=True,
             #vad_analyzer=SileroVADAnalyzer(),
             vad_audio_passthrough=True,
             serializer=TwilioFrameSerializer(stream_sid),
