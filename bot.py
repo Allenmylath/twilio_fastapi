@@ -1,8 +1,15 @@
 import os
 import sys
 
-from pipecat.audio.vad.silero import SileroVADAnalyzer
-from pipecat.frames.frames import EndFrame, LLMMessagesFrame
+#from pipecat.audio.vad.silero import SileroVADAnalyzer
+from pipecat.frames.frames import (
+    BotInterruptionFrame,
+    EndFrame,
+    StopInterruptionFrame,
+    UserStartedSpeakingFrame,
+    UserStoppedSpeakingFrame,
+    LLMMessagesFrame,
+)
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineParams, PipelineTask
@@ -38,7 +45,7 @@ async def run_bot(websocket_client, stream_sid):
             audio_out_enabled=True,
             add_wav_header=False,
             vad_enabled=True,
-            vad_analyzer=SileroVADAnalyzer(),
+            #vad_analyzer=SileroVADAnalyzer(),
             vad_audio_passthrough=True,
             serializer=TwilioFrameSerializer(stream_sid),
             audio_in_filter=NoisereduceFilter(),
@@ -47,7 +54,10 @@ async def run_bot(websocket_client, stream_sid):
 
     llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
-    stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
+    stt = DeepgramSTTService(
+            api_key=os.getenv("DEEPGRAM_API_KEY"),
+            live_options=LiveOptions(vad_events=True, utterance_end_ms="1000"),
+          )
 
     tts = CartesiaTTSService(
         api_key=os.getenv("CARTESIA_API_KEY"),
@@ -103,6 +113,14 @@ async def run_bot(websocket_client, stream_sid):
     )
 
     task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=True))
+
+    @stt.event_handler("on_speech_started")
+    async def on_speech_started(stt, *args, **kwargs):
+        await task.queue_frames([BotInterruptionFrame(), UserStartedSpeakingFrame()])
+
+    @stt.event_handler("on_utterance_end")
+    async def on_utterance_end(stt, *args, **kwargs):
+        await task.queue_frames([StopInterruptionFrame(), UserStoppedSpeakingFrame()])
 
     @transport.event_handler("on_client_connected")
     async def on_client_connected(transport, client):
