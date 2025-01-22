@@ -9,7 +9,7 @@ from pipecat.frames.frames import (
     StopInterruptionFrame,
     UserStartedSpeakingFrame,
     UserStoppedSpeakingFrame,
-    LLMMessagesFrame,
+    LLMMessagesFrame
 )
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
