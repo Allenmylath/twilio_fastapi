@@ -1,4 +1,4 @@
-pipecat-ai[cartesia,openai,silero,deepgram,noisereduce]
+pipecat-ai[cartesia,openai,silero,deepgram,noisereduce]==0.0.51
 fastapi
 uvicorn
 python-dotenv
