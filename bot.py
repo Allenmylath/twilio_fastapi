@@ -1,5 +1,6 @@
 import os
 import sys
+from deepgram import LiveOptions
 
 #from pipecat.audio.vad.silero import SileroVADAnalyzer
 from pipecat.frames.frames import (
