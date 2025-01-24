@@ -6,3 +6,4 @@ loguru
 #pipecat-ai-flows[daily,cartesia,openai,silero,deepgram]
 twilio
 PyPDF2
+mangum
