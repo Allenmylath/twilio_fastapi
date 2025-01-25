@@ -42,8 +42,8 @@ async def run_bot(websocket_client, stream_sid):
             vad_enabled=True,
             vad_analyzer=SileroVADAnalyzer(),
             vad_audio_passthrough=True,
-            serializer=TwilioFrameSerializer(stream_sid),
-            #audio_in_filter=NoisereduceFilter(),
+            serializer=TwilioFrameSerializer(stream_sid,params=TwilioFrameSerializer.InputParams(sample_rate=8000)),
+            audio_in_filter=NoisereduceFilter(),
         ),
     )
 
