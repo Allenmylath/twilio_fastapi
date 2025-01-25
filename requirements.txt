@@ -1,8 +1,8 @@
-pipecat-ai[cartesia,openai,silero,deepgram,noisereduce]==0.0.49
+pipecat-ai[cartesia,openai,silero,deepgram,noisereduce,gladia,groq]
 fastapi
 uvicorn
 python-dotenv
 loguru
-#pipecat-ai-flows[daily,cartesia,openai,silero,deepgram]
 twilio
-
+PyPDF2
+mangum
