@@ -47,10 +47,12 @@ async def run_bot(websocket_client, stream_sid):
         ),
     )
 
-    # llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
+    llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
+    '''
     llm = GroqLLMService(
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
     )
+    '''
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     stt = GladiaSTTService(
