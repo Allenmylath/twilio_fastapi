@@ -21,7 +21,7 @@ from pipecat.transports.network.fastapi_websocket import (
 from pipecat.serializers.twilio import TwilioFrameSerializer
 from pipecat.audio.filters.noisereduce_filter import NoisereduceFilter
 
-from pdfreader import read_pdf
+from text import text
 
 from loguru import logger
 
