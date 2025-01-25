@@ -4,5 +4,4 @@ uvicorn
 python-dotenv
 loguru
 twilio
-PyPDF2
-mangum
+
