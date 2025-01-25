@@ -9,7 +9,7 @@ from pipecat.pipeline.task import PipelineParams, PipelineTask
 from pipecat.processors.aggregators.openai_llm_context import OpenAILLMContext
 from pipecat.services.cartesia import CartesiaTTSService
 
-# from pipecat.services.openai import OpenAILLMService
+from pipecat.services.openai import OpenAILLMService
 from pipecat.services.groq import GroqLLMService
 
 # from pipecat.services.deepgram import DeepgramSTTService, GladiaSTTService
