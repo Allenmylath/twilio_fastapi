@@ -57,6 +57,7 @@ async def run_bot(websocket_client, stream_sid):
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     stt = GladiaSTTService(
         api_key=os.getenv("GLADIA_API_KEY"),
+        audio_enhancer=True,
     )
 
     tts = CartesiaTTSService(
