@@ -12,7 +12,7 @@ from pipecat.services.cartesia import CartesiaTTSService
 from pipecat.services.openai import OpenAILLMService
 
 
-# from pipecat.services.deepgram import DeepgramSTTService, GladiaSTTService
+# from pipecat.services.deepgram import DeepgramSTTService
 from pipecat.services.gladia import GladiaSTTService
 from pipecat.transports.network.fastapi_websocket import (
     FastAPIWebsocketTransport,
