@@ -32,31 +32,6 @@ load_dotenv(override=True)
 logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
-class TranscriptHandler:
-
-    def __init__(self):
-        """Initialize handler with an empty messages dictionary."""
-        self.messages_dict = {}
-
-    async def save_message(self, message: TranscriptionMessage):
-        timestamp = str(message.timestamp) if message.timestamp else str(len(self.messages_dict))
-        self.messages_dict[timestamp] = {
-            'role': message.role,
-            'content': message.content
-        }
-
-    async def on_transcript_update(
-        self, processor: TranscriptProcessor, frame: TranscriptionUpdateFrame
-    ) -> dict:
-
-        for msg in frame.messages:
-            await self.save_message(msg)
-        
-        return self.messages_dict
-
-    def get_messages(self) -> dict:
-
-        return self.messages_dict
 
 
 async def run_bot(websocket_client, stream_sid):
