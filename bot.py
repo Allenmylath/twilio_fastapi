@@ -8,6 +8,7 @@ from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineParams, PipelineTask
 from pipecat.processors.aggregators.openai_llm_context import OpenAILLMContext
 from pipecat.services.cartesia import CartesiaTTSService
+from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
 
 from pipecat.services.openai import OpenAILLMService
 
@@ -59,6 +60,7 @@ async def run_bot(websocket_client, stream_sid):
     stt = GladiaSTTService(
         api_key=os.getenv("GLADIA_API_KEY"),
         audio_enhancer=True,
+        text_filter=MarkdownTextFilter(),
     )
 
     tts = CartesiaTTSService(
