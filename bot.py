@@ -127,7 +127,7 @@ async def run_bot(websocket_client, stream_sid):
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
-        conversation_messages = context.get_messages()[1:]
+        conversation_messages = context.get_messages()[2:]
         conversation_json = json.dumps(conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2)
         logger.info(conversation_json)
     
