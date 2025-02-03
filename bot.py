@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
 from pipecat.frames.frames import EndFrame, LLMMessagesFrame
