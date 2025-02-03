@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import datetime
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
 from pipecat.frames.frames import EndFrame, LLMMessagesFrame
@@ -123,13 +124,34 @@ async def run_bot(websocket_client, stream_sid):
         )
         await task.queue_frames([LLMMessagesFrame(messages)])
 
-    @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
-        logger.info("Call ended. Conversation history:")
-        conversation_messages = context.get_messages()[1:]
-        conversation_json = json.dumps(conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2)
-        logger.info(conversation_json)
-        await task.queue_frames([EndFrame()])
+    logger.info("Call ended. Conversation history:")
+    conversation_messages = context.get_messages()[1:]
+    conversation_json = json.dumps(conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2)
+    logger.info(conversation_json)
+    
+    # Get current date and time for the email subject
+    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Create email subject and body
+    email_subject = f"Call Transcript - {current_datetime}"
+    email_body = f"""
+    Hello,
+    
+    This is a transcript of a real call between Jessica and a user.
+    
+    Transcript:
+    {conversation_json}
+    
+    Best regards,
+    Jessica AI Team
+    """
+    
+    # Send the transcript via email
+    send_bulk_emails(email_subject, email_body)
+    
+    # Continue with original functionality
+    await task.queue_frames([EndFrame()])
 
     runner = PipelineRunner(handle_sigint=False)
 
