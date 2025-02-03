@@ -123,6 +123,8 @@ async def run_bot(websocket_client, stream_sid):
 
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
+        logger.info("Call ended. Conversation history:")
+        logger.info(context.get_messages_json())
         await task.queue_frames([EndFrame()])
 
     runner = PipelineRunner(handle_sigint=False)
