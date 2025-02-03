@@ -126,7 +126,7 @@ async def run_bot(websocket_client, stream_sid):
         )
         await task.queue_frames([LLMMessagesFrame(messages)])
         """
-        await tts.say("Hi, I am Jessicca from CARE A.D.H.D. <break time="500ms"/>How can i help you ?? ")
+        await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
