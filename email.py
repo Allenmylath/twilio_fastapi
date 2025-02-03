@@ -10,10 +10,9 @@ sender_password = "dhnx dzgi cdzs yeea"
 
 # List of recipient emails
 recipient_emails = [
-    "example1@gmail.com",
-    "example2@yahoo.com",
-    "example3@outlook.com"
-]
+    "johananddijo@gmail.com",
+    "Mark.Pattison@careadhd.co.uk,
+    ]
 
 def send_email(recipient, subject, body):
     try:
