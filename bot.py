@@ -71,7 +71,29 @@ async def run_bot(websocket_client, stream_sid):
         api_key=os.getenv("CARTESIA_API_KEY"),
         voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
     )
-
+    tools = [
+        ChatCompletionToolParam(
+            type="function",
+            function={
+                "name": "send_email",
+                "description": "Use this function when: 1) User explicitly requests to speak with a human, 2) User expresses dissatisfaction with AI responses, 3) User needs to escalate an issue, or 4) The required information cannot be found in the available data. This will send their query to human support team.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "subject": {
+                            "type": "string",
+                            "description": "Should indicate the type of escalation (e.g., 'Support Request: Data Not Found', 'Escalation: User Request for Human Support', 'Customer Dissatisfaction Report')"
+                        },
+                        "body": {
+                            "type": "string",
+                            "description": "Must include: 1) Original user query, 2) Reason for escalation, 3) Any relevant conversation context, 4) What solutions were already attempted by AI"
+                        }
+                    },
+                    "required": ["subject", "body"]
+                }
+            }
+        )
+    ]
     
 
     messages = [
