@@ -59,6 +59,7 @@ async def run_bot(websocket_client, stream_sid):
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
     )
     """
+    llm.register_function(None, send_email)
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     stt = GladiaSTTService(
