@@ -83,11 +83,11 @@ async def run_bot(websocket_client, stream_sid):
                     "properties": {
                         "subject": {
                             "type": "string",
-                            "description": "Should indicate the type of escalation (e.g., 'Support Request: Data Not Found', 'Escalation: User Request for Human Support', 'Customer Dissatisfaction Report')",
+                            "Should indicate the type of escalation (e.g., 'Support Request: Data Not Found', 'Escalation: User Request for Human Support', 'Customer Dissatisfaction Report')",
                         },
                         "body": {
                             "type": "string",
-                            "description": "Must include: 1) Original user query, 2) Reason for escalation, 3) Any relevant conversation context, 4) What solutions were already attempted by AI",
+                            "Must include: 1) Original user query, 2) Reason for escalation, 3) Any relevant conversation context, 4) What solutions were already attempted by AI",
                         },
                     },
                     "required": ["subject", "body"],
