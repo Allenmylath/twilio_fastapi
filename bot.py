@@ -61,7 +61,12 @@ async def run_bot(websocket_client, stream_sid):
         ),
     )
 
-    llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o-mini")
+    llm = OpenAILLMService(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    model="gpt-4o-mini",
+    temperature=0,  
+    max_tokens=300  
+    )
     """
     llm = GroqLLMService(
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
