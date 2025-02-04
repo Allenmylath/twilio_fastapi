@@ -14,6 +14,8 @@ assessment, diagnosis, and treatment services for adults aged 18 and over with
 Attention Deficit Hyperactivity Disorder (ADHD). Our mission is to deliver high-quality,
 accessible, and affordable ADHD care, adhering to the gold-standard guidelines set by
 the National Institute for Health and Care Excellence (NICE).
+Working hours
+working hours  are Monday to Friday 9am to 5pm
 Our Mission and Values
 At CARE ADHD, our mission is to achieve the highest standards of clinical excellence in
 ADHD care. We are committed to ensuring that patient experience drives every decision
