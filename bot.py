@@ -12,6 +12,7 @@ from pipecat.processors.aggregators.openai_llm_context import OpenAILLMContext
 from pipecat.services.cartesia import CartesiaTTSService
 from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
 from pipecat.processors.aggregators.openai_llm_context import CustomEncoder
+from openai.types.chat import ChatCompletionToolParam
 
 from pipecat.services.openai import OpenAILLMService
 
@@ -38,7 +39,6 @@ logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
 
-
 async def run_bot(websocket_client, stream_sid):
     transport = FastAPIWebsocketTransport(
         websocket=websocket_client,
@@ -49,16 +49,16 @@ async def run_bot(websocket_client, stream_sid):
             vad_analyzer=SileroVADAnalyzer(),
             vad_audio_passthrough=True,
             serializer=TwilioFrameSerializer(stream_sid),
-            #audio_in_filter=NoisereduceFilter(),
+            # audio_in_filter=NoisereduceFilter(),
         ),
     )
 
     llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o-mini")
-    '''
+    """
     llm = GroqLLMService(
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
     )
-    '''
+    """
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     stt = GladiaSTTService(
@@ -82,19 +82,18 @@ async def run_bot(websocket_client, stream_sid):
                     "properties": {
                         "subject": {
                             "type": "string",
-                            "description": "Should indicate the type of escalation (e.g., 'Support Request: Data Not Found', 'Escalation: User Request for Human Support', 'Customer Dissatisfaction Report')"
+                            "description": "Should indicate the type of escalation (e.g., 'Support Request: Data Not Found', 'Escalation: User Request for Human Support', 'Customer Dissatisfaction Report')",
                         },
                         "body": {
                             "type": "string",
-                            "description": "Must include: 1) Original user query, 2) Reason for escalation, 3) Any relevant conversation context, 4) What solutions were already attempted by AI"
-                        }
+                            "description": "Must include: 1) Original user query, 2) Reason for escalation, 3) Any relevant conversation context, 4) What solutions were already attempted by AI",
+                        },
                     },
-                    "required": ["subject", "body"]
-                }
-            }
+                    "required": ["subject", "body"],
+                },
+            },
         )
     ]
-    
 
     messages = [
         {
@@ -149,17 +148,18 @@ async def run_bot(websocket_client, stream_sid):
         await task.queue_frames([LLMMessagesFrame(messages)])
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
+
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
         conversation_messages = context.get_messages()[1:]
-        conversation_json = json.dumps(conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2)
+        conversation_json = json.dumps(
+            conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
+        )
         logger.info(conversation_json)
-    
-    
+
         current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    
+
         email_subject = f"Call Transcript - {current_datetime}"
         email_body = f"""
         Hello,
@@ -172,10 +172,10 @@ async def run_bot(websocket_client, stream_sid):
         Best regards,
         Jessica AI Team
         """
-    
+
         # Send the transcript via email
         send_email(email_subject, email_body)
-    
+
         # Continue with original functionality
         await task.queue_frames([EndFrame()])
 
