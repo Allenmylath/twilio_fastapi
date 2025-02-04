@@ -39,7 +39,7 @@ logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
 
-def send_email_wrapper(function_name, tool_call_id, arguments, llm, context, callback):
+async def send_email_wrapper(function_name, tool_call_id, arguments, llm, context, callback):
     # Extract just the subject and body from the arguments dictionary
     subject = arguments.get("subject")
     body = arguments.get("body")
