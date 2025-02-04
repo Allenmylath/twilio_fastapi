@@ -12,7 +12,8 @@ sender_password = "dhnx dzgi cdzs yeea"
 recipient_emails = [
     "johananddijo@gmail.com",
     "Mark.Pattison@careadhd.co.uk",
-    ]
+]
+
 
 def email_init(recipient, subject, body):
     try:
@@ -29,21 +30,24 @@ def email_init(recipient, subject, body):
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()  # Enable TLS
             server.login(sender_email, sender_password)
-            
+
             # Send email
             server.send_message(message)
             print(f"Successfully sent email to {recipient}")
-            
+
     except Exception as e:
         print(f"Failed to send email to {recipient}. Error: {str(e)}")
 
+
 def send_email(subject, body):
     print("Starting bulk email sending...")
-    
+
     for recipient in recipient_emails:
-        send_email(recipient, subject, body)
-    
+        email_init(recipient, subject, body)
+
     print("Bulk email sending completed!")
+
+
 '''
 # Example usage
 if __name__ == "__main__":
