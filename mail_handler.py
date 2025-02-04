@@ -14,7 +14,7 @@ recipient_emails = [
     "Mark.Pattison@careadhd.co.uk",
     ]
 
-def send_email(recipient, subject, body):
+def email_init(recipient, subject, body):
     try:
         # Create message
         message = MIMEMultipart()
@@ -37,7 +37,7 @@ def send_email(recipient, subject, body):
     except Exception as e:
         print(f"Failed to send email to {recipient}. Error: {str(e)}")
 
-def send_bulk_emails(subject, body):
+def send_email(subject, body):
     print("Starting bulk email sending...")
     
     for recipient in recipient_emails:
