@@ -39,6 +39,14 @@ logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
 
+def send_email_wrapper(function_name, tool_call_id, arguments, llm, context, callback):
+    # Extract just the subject and body from the arguments dictionary
+    subject = arguments.get("subject")
+    body = arguments.get("body")
+    # Call our actual send_email function with just the two arguments it expects
+    return send_email(subject, body)
+
+
 async def run_bot(websocket_client, stream_sid):
     transport = FastAPIWebsocketTransport(
         websocket=websocket_client,
@@ -59,7 +67,7 @@ async def run_bot(websocket_client, stream_sid):
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
     )
     """
-    llm.register_function(None, send_email)
+    llm.register_function(None, send_email_wrapper)
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     stt = GladiaSTTService(
