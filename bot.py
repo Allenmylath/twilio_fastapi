@@ -24,7 +24,7 @@ from pipecat.transports.network.fastapi_websocket import (
 )
 from pipecat.serializers.twilio import TwilioFrameSerializer
 from pipecat.audio.filters.noisereduce_filter import NoisereduceFilter
-from mail_handler import send_bulk_emails
+from mail_handler import send_email
 
 from text import text
 
@@ -152,7 +152,7 @@ async def run_bot(websocket_client, stream_sid):
         """
     
         # Send the transcript via email
-        send_bulk_emails(email_subject, email_body)
+        send_email(email_subject, email_body)
     
         # Continue with original functionality
         await task.queue_frames([EndFrame()])
