@@ -54,6 +54,7 @@ async def run_bot(websocket_client, stream_sid):
         websocket=websocket_client,
         params=FastAPIWebsocketParams(
             audio_out_enabled=True,
+            audio_in_enabled=True,
             add_wav_header=False,
             #vad_enabled=True,
             #vad_analyzer=SileroVADAnalyzer(),
