@@ -48,7 +48,7 @@ class NoiseReducer(FrameProcessor):
             audio_data = np.frombuffer(frame.audio, dtype=np.float32)
             
             # Add a small epsilon to avoid division by zero
-            epsilon = 1e-10
+            epsilon = 1e-7
             audio_data = audio_data.astype(np.float32) + epsilon
 
             # Apply noise reduction with default parameters
