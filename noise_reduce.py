@@ -19,7 +19,7 @@ class NoiseReducer(FrameProcessor):
     def __init__(self) -> None:
         super().__init__()
         self._filtering = True
-        self._sample_rate = 0
+        self._sample_rate = 8000
 
     async def start(self, sample_rate: int):
         """Start the noise reducer with the given sample rate.
