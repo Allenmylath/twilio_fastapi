@@ -12,6 +12,7 @@ from pipecat.processors.aggregators.openai_llm_context import OpenAILLMContext
 from pipecat.services.cartesia import CartesiaTTSService
 from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
 from pipecat.processors.aggregators.openai_llm_context import CustomEncoder
+from pipecat.processors.audio.vad.silero import SileroVAD
 from openai.types.chat import ChatCompletionToolParam
 
 from pipecat.services.openai import OpenAILLMService
@@ -54,9 +55,9 @@ async def run_bot(websocket_client, stream_sid):
         params=FastAPIWebsocketParams(
             audio_out_enabled=True,
             add_wav_header=False,
-            vad_enabled=True,
-            vad_analyzer=SileroVADAnalyzer(),
-            vad_audio_passthrough=True,
+            #vad_enabled=True,
+            #vad_analyzer=SileroVADAnalyzer(),
+            #vad_audio_passthrough=True,
             serializer=TwilioFrameSerializer(stream_sid),
             #audio_in_filter=NoisereduceFilter(),
         ),
@@ -87,6 +88,7 @@ async def run_bot(websocket_client, stream_sid):
         api_key=os.getenv("CARTESIA_API_KEY"),
         voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
     )
+    vad = SileroVAD()
     tools = [
         ChatCompletionToolParam(
             type="function",
@@ -145,6 +147,7 @@ async def run_bot(websocket_client, stream_sid):
         [
             transport.input(),  # Websocket input from client
             nr,
+            vad, 
             stt,  # Speech-To-Text
             context_aggregator.user(),
             llm,  # LLM
