@@ -21,17 +21,15 @@ class NoiseReducer(FrameProcessor):
     def __init__(
         self,
         *,
-        sample_rate: Optional[int] = None,
         audio_passthrough: bool = True,
     ):
         """Initialize the noise reducer processor.
         
         Args:
-            sample_rate: Audio sample rate (Hz). Can be set later via StartFrame.
             audio_passthrough: Whether to pass through audio frames that couldn't be processed.
         """
         super().__init__()
-        self._sample_rate = sample_rate
+        self._sample_rate = None
         self._audio_passthrough = audio_passthrough
 
     async def process_frame(self, frame: Frame, direction: FrameDirection):
@@ -42,9 +40,7 @@ class NoiseReducer(FrameProcessor):
         await super().process_frame(frame, direction)
 
         if isinstance(frame, StartFrame):
-            if frame.audio_in_sample_rate:
-                self._sample_rate = frame.audio_in_sample_rate
-                logger.debug(f"Set sample rate to {self._sample_rate}")
+            self._sample_rate = frame.audio_in_sample_rate
             await self.push_frame(frame, direction)
 
         elif isinstance(frame, AudioRawFrame):
