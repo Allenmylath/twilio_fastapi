@@ -9,7 +9,6 @@ from loguru import logger
 from pipecat.frames.frames import (
     AudioRawFrame,
     Frame,
-    StartFrame,
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
@@ -37,13 +36,8 @@ class NoiseReducer(FrameProcessor):
         """
         await super().process_frame(frame, direction)
 
-        if isinstance(frame, StartFrame):
-            await self.start(frame.audio_in_sample_rate)
-            await self.push_frame(frame, direction)
-
-        elif isinstance(frame, AudioRawFrame) and self._filtering:
+        if isinstance(frame, AudioRawFrame) and self._filtering:
             await self._reduce_noise(frame, direction)
-
         else:
             await self.push_frame(frame, direction)
 
