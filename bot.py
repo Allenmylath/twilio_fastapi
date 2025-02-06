@@ -26,6 +26,7 @@ from pipecat.transports.network.fastapi_websocket import (
 from pipecat.serializers.twilio import TwilioFrameSerializer
 from pipecat.audio.filters.noisereduce_filter import NoisereduceFilter
 from mail_handler import send_email
+from noise_reduce import NoiseReducer
 
 from text import text
 
@@ -60,6 +61,7 @@ async def run_bot(websocket_client, stream_sid):
             #audio_in_filter=NoisereduceFilter(),
         ),
     )
+    nr = NoiseReducer()
 
     llm = OpenAILLMService(
     api_key=os.getenv("OPENAI_API_KEY"),
@@ -142,6 +144,7 @@ async def run_bot(websocket_client, stream_sid):
     pipeline = Pipeline(
         [
             transport.input(),  # Websocket input from client
+            nr,
             stt,  # Speech-To-Text
             context_aggregator.user(),
             llm,  # LLM
