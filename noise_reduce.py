@@ -1,77 +1,76 @@
+# Copyright (c) 2024–2025, Daily
+#
+# SPDX-License-Identifier: BSD 2-Clause License
+#
 import numpy as np
-import noisereduce as nr
 from loguru import logger
-import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from pipecat.frames.frames import (
-    AudioRawFrame,
-    Frame,
-)
-from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
+from functools import partial
+import asyncio
+from pipecat.audio.filters.base_audio_filter import BaseAudioFilter
+from pipecat.frames.frames import FilterControlFrame, FilterEnableFrame
 
-class NoiseReducer(FrameProcessor):
-    def __init__(self, max_workers: int = 1) -> None:
+try:
+    import noisereduce as nr
+except ModuleNotFoundError as e:
+    logger.error(f"Exception: {e}")
+    logger.error(
+        "In order to use the noisereduce filter, you need to `pip install pipecat-ai[noisereduce]`."
+    )
+    raise Exception(f"Missing module: {e}")
+
+
+class NoisereduceFilter(BaseAudioFilter):
+    def __init__(self) -> None:
         super().__init__()
         self._filtering = True
-        self._sample_rate = 8000
-        self._num_channels = 1
-        self._executor = ThreadPoolExecutor(max_workers=max_workers)
-        logger.debug(f"NoiseReducer initialized with max_workers={max_workers}")
+        self._sample_rate = 0
+        self._executor = None  # Initialize executor when needed
 
-    async def start(self, sample_rate: int, num_channels: int = 1):
+    async def start(self, sample_rate: int):
         self._sample_rate = sample_rate
-        self._num_channels = num_channels
-        logger.info(f"Starting NoiseReducer with sample_rate={sample_rate}, num_channels={num_channels}")
-        await super().start()
-
-    async def process_frame(self, frame: Frame, direction: FrameDirection):
-        await super().process_frame(frame, direction)
-        if isinstance(frame, AudioRawFrame) and self._filtering:
-            logger.debug(f"Processing AudioRawFrame, sr={frame.sample_rate}, ch={frame.num_channels}")
-            await self._reduce_noise(frame, direction)
-        else:
-            await self.push_frame(frame, direction)
-
-    async def _reduce_noise(self, frame: AudioRawFrame, direction: FrameDirection):
-        try:
-            logger.debug(f"Input audio size: {len(frame.audio)} bytes")
-            reduced_audio = await asyncio.get_event_loop().run_in_executor(
-                self._executor,
-                self._process_audio,
-                frame.audio
-            )
-            logger.debug(f"Output audio size: {len(reduced_audio)} bytes")
-            
-            new_frame = AudioRawFrame(
-                audio=reduced_audio,
-                #timestamp=frame.timestamp,
-                sample_rate=frame.sample_rate,
-                num_channels=frame.num_channels
-            )
-            await self.push_frame(new_frame, direction)
-            
-        except Exception as e:
-            logger.error(f"Error reducing noise: {e}")
-            logger.error(f"Frame details: sr={frame.sample_rate}, ch={frame.num_channels}, size={len(frame.audio)}")
-            await self.push_frame(frame, direction)
-
-    def _process_audio(self, audio_bytes: bytes) -> bytes:
-        audio_data = np.frombuffer(audio_bytes, dtype=np.float32)
-        logger.debug(f"Audio array shape: {audio_data.shape}, dtype: {audio_data.dtype}")
-        logger.debug(f"Audio stats - min: {np.min(audio_data)}, max: {np.max(audio_data)}, mean: {np.mean(audio_data)}")
-        
-        audio_data = audio_data.astype(np.float32)
-        audio_data = np.where(audio_data == 0, 1e-10, audio_data)
-        
-        reduced_audio = nr.reduce_noise(
-            y=audio_data,
-            sr=self._sample_rate,
-            prop_decrease=0.75
-        )
-        logger.debug(f"Reduced audio stats - min: {np.min(reduced_audio)}, max: {np.max(reduced_audio)}, mean: {np.mean(reduced_audio)}")
-        return reduced_audio.astype(np.float32).tobytes()
+        # Create executor when starting
+        self._executor = ThreadPoolExecutor(max_workers=1)
+        logger.debug("NoisereduceFilter started with sample rate: {}", sample_rate)
 
     async def stop(self):
-        logger.info("Stopping NoiseReducer")
-        self._executor.shutdown()
-        await super().stop()
+        if self._executor:
+            logger.debug("Shutting down NoisereduceFilter executor")
+            self._executor.shutdown(wait=True)
+            self._executor = None
+
+    async def process_frame(self, frame: FilterControlFrame):
+        if isinstance(frame, FilterEnableFrame):
+            self._filtering = frame.enable
+            logger.debug("NoisereduceFilter enabled: {}", self._filtering)
+
+    def _apply_noise_reduction(self, data: np.ndarray) -> np.ndarray:
+        """Apply noise reduction in a separate thread to avoid blocking the event loop."""
+        try:
+            return nr.reduce_noise(y=data, sr=self._sample_rate)
+        except Exception as e:
+            logger.error(f"Error in noise reduction: {e}")
+            return data  # Return original data on error
+
+    async def filter(self, audio: bytes) -> bytes:
+        if not self._filtering or not self._executor:
+            return audio
+
+        try:
+            data = np.frombuffer(audio, dtype=np.int16)
+            # Add a small epsilon to avoid division by zero
+            epsilon = 1e-10
+            data = data.astype(np.float32) + epsilon
+
+            # Run noise reduction in threadpool to avoid blocking
+            reduced_noise = await asyncio.get_event_loop().run_in_executor(
+                self._executor,
+                partial(self._apply_noise_reduction, data)
+            )
+
+            # Clip and convert back to int16
+            return np.clip(reduced_noise, -32768, 32767).astype(np.int16).tobytes()
+            
+        except Exception as e:
+            logger.error(f"Error in filter: {e}")
+            return audio  # Return original audio on error
