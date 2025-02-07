@@ -30,7 +30,7 @@ class NoisereduceFilter(BaseAudioFilter):
     async def start(self, sample_rate: int):
         self._sample_rate = sample_rate
         # Create executor when starting
-        self._executor = ThreadPoolExecutor(max_workers=1)
+        self._executor = ThreadPoolExecutor(max_workers=5)
         logger.debug("NoisereduceFilter started with sample rate: {}", sample_rate)
 
     async def stop(self):
