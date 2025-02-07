@@ -148,7 +148,7 @@ async def run_bot(websocket_client, stream_sid):
         [
             transport.input(),  # Websocket input from client
             nr,
-            vad, 
+            #vad, 
             stt,  # Speech-To-Text
             context_aggregator.user(),
             llm,  # LLM
