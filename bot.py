@@ -25,9 +25,9 @@ from pipecat.transports.network.fastapi_websocket import (
     FastAPIWebsocketParams,
 )
 from pipecat.serializers.twilio import TwilioFrameSerializer
-from pipecat.audio.filters.noisereduce_filter import NoisereduceFilter
+from noise_reduce import NoisereduceFilter
 from mail_handler import send_email
-from noise_reduce import NoiseReducer
+#from noise_reduce import NoiseReducer
 
 from text import text
 
@@ -56,11 +56,11 @@ async def run_bot(websocket_client, stream_sid):
             audio_out_enabled=True,
             audio_in_enabled=True,
             add_wav_header=False,
-            #vad_enabled=True,
-            #vad_analyzer=SileroVADAnalyzer(),
-            #vad_audio_passthrough=True,
+            vad_enabled=True,
+            vad_analyzer=SileroVADAnalyzer(),
+            vad_audio_passthrough=True,
             serializer=TwilioFrameSerializer(stream_sid),
-            #audio_in_filter=NoisereduceFilter(),
+            audio_in_filter=NoisereduceFilter(),
         ),
     )
     nr = NoiseReducer()
@@ -147,7 +147,7 @@ async def run_bot(websocket_client, stream_sid):
     pipeline = Pipeline(
         [
             transport.input(),  # Websocket input from client
-            nr,
+            #nr,
             #vad, 
             stt,  # Speech-To-Text
             context_aggregator.user(),
