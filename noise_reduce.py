@@ -14,10 +14,12 @@ class NoiseReducer(FrameProcessor):
         super().__init__()
         self._filtering = True
         self._sample_rate = 8000
+        self._num_channels = 1
         self._executor = ThreadPoolExecutor(max_workers=max_workers)
 
-    async def start(self, sample_rate: int):
+    async def start(self, sample_rate: int, num_channels: int = 1):
         self._sample_rate = sample_rate
+        self._num_channels = num_channels
 
     async def process_frame(self, frame: Frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
@@ -36,7 +38,8 @@ class NoiseReducer(FrameProcessor):
             
             new_frame = AudioRawFrame(
                 audio=reduced_audio,
-                #timestamp=frame.timestamp,
+                sample_rate=self._sample_rate,
+                num_channels=self._num_channels
             )
             await self.push_frame(new_frame, direction)
             
@@ -46,7 +49,10 @@ class NoiseReducer(FrameProcessor):
 
     def _process_audio(self, audio_bytes: bytes) -> bytes:
         audio_data = np.frombuffer(audio_bytes, dtype=np.float32)
-        epsilon = 1e-7
+        if len(audio_data) == 0:
+            return audio_bytes
+            
+        epsilon = 1e-10
         audio_data = audio_data.astype(np.float32) + epsilon
         reduced_audio = nr.reduce_noise(y=audio_data, sr=self._sample_rate)
         return reduced_audio.astype(np.float32).tobytes()
