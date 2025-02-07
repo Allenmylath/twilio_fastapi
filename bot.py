@@ -147,7 +147,7 @@ async def run_bot(websocket_client, stream_sid):
     pipeline = Pipeline(
         [
             transport.input(),  # Websocket input from client
-            #nr,
+            nr,
             vad, 
             stt,  # Speech-To-Text
             context_aggregator.user(),
