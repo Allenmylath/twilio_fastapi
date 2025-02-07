@@ -20,6 +20,7 @@ class NoiseReducer(FrameProcessor):
     async def start(self, sample_rate: int, num_channels: int = 1):
         self._sample_rate = sample_rate
         self._num_channels = num_channels
+        await super().start()
 
     async def process_frame(self, frame: Frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
@@ -39,8 +40,8 @@ class NoiseReducer(FrameProcessor):
             new_frame = AudioRawFrame(
                 audio=reduced_audio,
                 #timestamp=frame.timestamp,
-                sample_rate=self._sample_rate,
-                num_channels=self._num_channels
+                sample_rate=frame.sample_rate,
+                num_channels=frame.num_channels
             )
             await self.push_frame(new_frame, direction)
             
@@ -52,7 +53,11 @@ class NoiseReducer(FrameProcessor):
         audio_data = np.frombuffer(audio_bytes, dtype=np.float32)
         audio_data = audio_data.astype(np.float32)
         audio_data = np.where(audio_data == 0, 1e-10, audio_data)
-        reduced_audio = nr.reduce_noise(y=audio_data, sr=self._sample_rate, prop_decrease=0.75)
+        reduced_audio = nr.reduce_noise(
+            y=audio_data,
+            sr=self._sample_rate,
+            prop_decrease=0.75
+        )
         return reduced_audio.astype(np.float32).tobytes()
 
     async def stop(self):
