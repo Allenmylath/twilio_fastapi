@@ -10,7 +10,7 @@ from pipecat.frames.frames import (
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
 class NoiseReducer(FrameProcessor):
-    def __init__(self, max_workers: int = 4) -> None:
+    def __init__(self, max_workers: int = 1) -> None:
         super().__init__()
         self._filtering = True
         self._sample_rate = 8000
@@ -52,7 +52,7 @@ class NoiseReducer(FrameProcessor):
         audio_data = np.frombuffer(audio_bytes, dtype=np.float32)
         audio_data = audio_data.astype(np.float32)
         audio_data = np.where(audio_data == 0, 1e-10, audio_data)
-        reduced_audio = nr.reduce_noise(y=audio_data, sr=self._sample_rate)
+        reduced_audio = nr.reduce_noise(y=audio_data, sr=self._sample_rate, prop_decrease=0.75)
         return reduced_audio.astype(np.float32).tobytes()
 
     async def stop(self):
