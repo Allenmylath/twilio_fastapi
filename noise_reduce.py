@@ -12,7 +12,7 @@ from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 def _reduce_noise_worker(audio_bytes: bytes, sample_rate: int) -> bytes:
     """Worker function to run noise reduction in a separate process."""
     audio_data = np.frombuffer(audio_bytes, dtype=np.float32)
-    epsilon = 1e-7
+    epsilon = 1e-10
     audio_data = audio_data.astype(np.float32) + epsilon
     reduced_audio = nr.reduce_noise(
         y=audio_data,
