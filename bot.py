@@ -63,7 +63,7 @@ async def run_bot(websocket_client, stream_sid):
             audio_in_filter=NoisereduceFilter(),
         ),
     )
-    nr = NoiseReducer()
+    #nr = NoiseReducer()
 
     llm = OpenAILLMService(
     api_key=os.getenv("OPENAI_API_KEY"),
