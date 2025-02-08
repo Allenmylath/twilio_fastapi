@@ -25,7 +25,8 @@ from pipecat.transports.network.fastapi_websocket import (
     FastAPIWebsocketParams,
 )
 from pipecat.serializers.twilio import TwilioFrameSerializer
-from noise_reduce import NoisereduceFilter
+from pipecat.audio.filter.koala_filter import KoalaFilter 
+#from noise_reduce import NoisereduceFilter
 from mail_handler import send_email
 #from noise_reduce import NoiseReducer
 
@@ -60,7 +61,7 @@ async def run_bot(websocket_client, stream_sid):
             vad_analyzer=SileroVADAnalyzer(),
             vad_audio_passthrough=True,
             serializer=TwilioFrameSerializer(stream_sid),
-            audio_in_filter=NoisereduceFilter(),
+            audio_in_filter=KoalaFilter(access_key=os.getenv("KOALA_ACCESS_KEY")),
         ),
     )
     #nr = NoiseReducer()
