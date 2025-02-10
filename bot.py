@@ -80,11 +80,15 @@ async def run_bot(websocket_client, stream_sid):
     llm.register_function(None, send_email_wrapper)
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
+    '''
     stt = GladiaSTTService(
         api_key=os.getenv("GLADIA_API_KEY"),
         audio_enhancer=True,
         text_filter=MarkdownTextFilter(),
     )
+    '''
+    stt = GroqSTTService(api_key=os.getenv("GROQ_API_KEY"), model="distil-whisper-large-v3-en")
+
 
     tts = CartesiaTTSService(
         api_key=os.getenv("CARTESIA_API_KEY"),
