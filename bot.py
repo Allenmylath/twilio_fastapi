@@ -88,7 +88,7 @@ async def run_bot(websocket_client, stream_sid):
         text_filter=MarkdownTextFilter(),
     )
     '''
-    stt = GroqSTTService(api_key=os.getenv("GROQ_API_KEY"), model="distil-whisper-large-v3-en")
+    stt = GroqSTTService(api_key=os.getenv("GROQ_API_KEY"), model="distil-whisper-large-v3-en", text_filter=MarkdownTextFilter())
 
 
     tts = CartesiaTTSService(
