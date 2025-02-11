@@ -193,38 +193,7 @@ async def run_bot(websocket_client, stream_sid):
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
 
-    '''
-    @transport.event_handler("on_client_disconnected")
-    async def on_client_disconnected(transport, client):
-        logger.info("Call ended. Conversation history:")
-        conversation_messages = context.get_messages()[1:]
-        conversation_json = json.dumps(
-            conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
-        )
-        logger.info(conversation_json)
-
-        current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        email_subject = f"Call Transcript - {current_datetime}"
-        email_body = f"""
-        Hello,
     
-        This is a transcript of a real call between Jessica and a user.
-    
-        Transcript:
-        {conversation_json}
-    
-        Best regards,
-        Jessica AI Team
-        """
-   
-        # Send the transcript via email
-        send_email(email_subject, email_body)
-
-        # Continue with original functionality
-        await task.queue_frames([EndFrame()])
-    '''
-
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
