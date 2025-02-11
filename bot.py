@@ -14,6 +14,7 @@ from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
 from pipecat.processors.aggregators.openai_llm_context import CustomEncoder
 from pipecat.processors.audio.vad.silero import SileroVAD
 from openai.types.chat import ChatCompletionToolParam
+from pipecat.processors.transcript_processor import TranscriptProcessor
 from groq import GroqSTTService
 
 from pipecat.services.openai import OpenAILLMService
