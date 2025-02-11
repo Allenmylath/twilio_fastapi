@@ -1,4 +1,5 @@
 from pipecat.frames.frames import TranscriptionMessage, TranscriptionUpdateFrame
+from pipecat.processors.transcript_processor import TranscriptProcessor
 from typing import List, Optional
 import logging
 
