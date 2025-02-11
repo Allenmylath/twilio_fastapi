@@ -11,7 +11,7 @@ sender_password = "dhnx dzgi cdzs yeea"
 # List of recipient emails
 recipient_emails = [
     "johananddijo@gmail.com",
-    "Mark.Pattison@careadhd.co.uk",
+    #"Mark.Pattison@careadhd.co.uk",
 ]
 
 
