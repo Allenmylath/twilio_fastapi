@@ -27,10 +27,12 @@ from pipecat.transports.network.fastapi_websocket import (
     FastAPIWebsocketParams,
 )
 from pipecat.serializers.twilio import TwilioFrameSerializer
-from pipecat.audio.filters.koala_filter import KoalaFilter 
-#from noise_reduce import NoisereduceFilter
+from pipecat.audio.filters.koala_filter import KoalaFilter
+
+# from noise_reduce import NoisereduceFilter
 from mail_handler import send_email
-#from noise_reduce import NoiseReducer
+
+# from noise_reduce import NoiseReducer
 from transcription import TranscriptHandler
 
 from text import text
@@ -45,7 +47,9 @@ logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
 
-async def send_email_wrapper(function_name, tool_call_id, arguments, llm, context, callback):
+async def send_email_wrapper(
+    function_name, tool_call_id, arguments, llm, context, callback
+):
     # Extract just the subject and body from the arguments dictionary
     subject = arguments.get("subject")
     body = arguments.get("body")
@@ -67,13 +71,13 @@ async def run_bot(websocket_client, stream_sid):
             audio_in_filter=KoalaFilter(access_key=os.getenv("KOALA_ACCESS_KEY")),
         ),
     )
-    #nr = NoiseReducer()
+    # nr = NoiseReducer()
 
     llm = OpenAILLMService(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    model="gpt-4o-mini",
-    temperature=0,  
-    max_tokens=300  
+        api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-4o-mini",
+        temperature=0,
+        max_tokens=300,
     )
     """
     llm = GroqLLMService(
@@ -83,15 +87,16 @@ async def run_bot(websocket_client, stream_sid):
     llm.register_function(None, send_email_wrapper)
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
-    '''
+    """
     stt = GladiaSTTService(
         api_key=os.getenv("GLADIA_API_KEY"),
         audio_enhancer=True,
         text_filter=MarkdownTextFilter(),
     )
-    '''
-    stt = GroqSTTService(api_key=os.getenv("GROQ_API_KEY"), model="whisper-large-v3-turbo")
-
+    """
+    stt = GroqSTTService(
+        api_key=os.getenv("GROQ_API_KEY"), model="whisper-large-v3-turbo"
+    )
 
     tts = CartesiaTTSService(
         api_key=os.getenv("CARTESIA_API_KEY"),
@@ -158,10 +163,10 @@ async def run_bot(websocket_client, stream_sid):
     pipeline = Pipeline(
         [
             transport.input(),  # Websocket input from client
-            #nr,
-            #vad, 
+            # nr,
+            # vad,
             stt,  # Speech-To-Text
-            transcript.user(), 
+            transcript.user(),
             context_aggregator.user(),
             llm,  # LLM
             tts,  # Text-To-Speech
@@ -187,7 +192,8 @@ async def run_bot(websocket_client, stream_sid):
         await task.queue_frames([LLMMessagesFrame(messages)])
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
-'''
+
+    '''
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
@@ -217,32 +223,32 @@ async def run_bot(websocket_client, stream_sid):
 
         # Continue with original functionality
         await task.queue_frames([EndFrame()])
-        '''
+    '''
 
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
-    
+
         # Get transcript data from the handler
         transcript_data = transport.transcript_handler.get_transcript()
         conversation_messages = transcript_data["messages"]
-    
+
         conversation_json = json.dumps(
             conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
         )
         logger.info(conversation_json)
-    
+
         current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         email_subject = f"Call Transcript - {current_datetime}"
-    
+
         # Format the transcript messages for email
         formatted_messages = []
         for msg in conversation_messages:
-            timestamp = f"[{msg['timestamp']}] " if msg['timestamp'] else ""
+            timestamp = f"[{msg['timestamp']}] " if msg["timestamp"] else ""
             formatted_messages.append(f"{timestamp}{msg['role']}: {msg['content']}")
-    
+
         formatted_transcript = "\n".join(formatted_messages)
-    
+
         email_body = f"""
         Hello,
 
@@ -254,7 +260,7 @@ async def run_bot(websocket_client, stream_sid):
         Best regards,
         Jessica AI Team
         """
-    
+
         # Send the transcript via email
         send_email(email_subject, email_body)
         await task.queue_frames([EndFrame()])
