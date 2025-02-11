@@ -31,6 +31,7 @@ from pipecat.audio.filters.koala_filter import KoalaFilter
 #from noise_reduce import NoisereduceFilter
 from mail_handler import send_email
 #from noise_reduce import NoiseReducer
+from transcription import TranscriptHandler
 
 from text import text
 
