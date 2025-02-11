@@ -230,7 +230,7 @@ async def run_bot(websocket_client, stream_sid):
         logger.info("Call ended. Conversation history:")
 
         # Get transcript data from the handler
-        transcript_data = transport.transcript_handler.get_transcript()
+        transcript_data = transcript_handler.get_transcript()
         conversation_messages = transcript_data["messages"]
 
         conversation_json = json.dumps(
