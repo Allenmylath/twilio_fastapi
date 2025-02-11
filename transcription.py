@@ -36,7 +36,7 @@ class TranscriptHandler:
         timestamp = message.timestamp if message.timestamp else None
         message_data = {
             "timestamp": timestamp,
-            "role": message.role,
+            "role": "jessica" if message.role == "assistant" else message.role,
             "content": message.content
         }
         
