@@ -151,6 +151,8 @@ async def run_bot(websocket_client, stream_sid):
 
     context = OpenAILLMContext(messages, tools)
     context_aggregator = llm.create_context_aggregator(context)
+    transcript = TranscriptProcessor()
+    transcript_handler = TranscriptHandler()
 
     pipeline = Pipeline(
         [
@@ -158,10 +160,12 @@ async def run_bot(websocket_client, stream_sid):
             #nr,
             #vad, 
             stt,  # Speech-To-Text
+            transcript.user(), 
             context_aggregator.user(),
             llm,  # LLM
             tts,  # Text-To-Speech
             transport.output(),  # Websocket output to client
+            transcript.assistant(),
             context_aggregator.assistant(),
         ]
     )
