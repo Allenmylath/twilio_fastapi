@@ -187,7 +187,7 @@ async def run_bot(websocket_client, stream_sid):
         await task.queue_frames([LLMMessagesFrame(messages)])
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
-
+'''
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
@@ -211,11 +211,52 @@ async def run_bot(websocket_client, stream_sid):
         Best regards,
         Jessica AI Team
         """
-
+   
         # Send the transcript via email
         send_email(email_subject, email_body)
 
         # Continue with original functionality
+        await task.queue_frames([EndFrame()])
+        '''
+
+    @transport.event_handler("on_client_disconnected")
+    async def on_client_disconnected(transport, client):
+        logger.info("Call ended. Conversation history:")
+    
+        # Get transcript data from the handler
+        transcript_data = transport.transcript_handler.get_transcript()
+        conversation_messages = transcript_data["messages"]
+    
+        conversation_json = json.dumps(
+            conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
+        )
+        logger.info(conversation_json)
+    
+        current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        email_subject = f"Call Transcript - {current_datetime}"
+    
+        # Format the transcript messages for email
+        formatted_messages = []
+        for msg in conversation_messages:
+            timestamp = f"[{msg['timestamp']}] " if msg['timestamp'] else ""
+            formatted_messages.append(f"{timestamp}{msg['role']}: {msg['content']}")
+    
+        formatted_transcript = "\n".join(formatted_messages)
+    
+        email_body = f"""
+        Hello,
+
+        This is a transcript of a real call between Jessica and a user.
+
+        Transcript:
+        {formatted_transcript}
+
+        Best regards,
+        Jessica AI Team
+        """
+    
+        # Send the transcript via email
+        send_email(email_subject, email_body)
         await task.queue_frames([EndFrame()])
 
     runner = PipelineRunner(handle_sigint=False)
