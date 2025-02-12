@@ -51,8 +51,9 @@ async def websocket_endpoint(websocket: WebSocket):
     call_data = json.loads(await start_data.__anext__())
     print(call_data, flush=True)
     stream_sid = call_data["start"]["streamSid"]
+    call_sid = call_data["start"]["callSid"]
     print("WebSocket connection accepted")
-    await run_bot(websocket, stream_sid)
+    await run_bot(websocket, stream_sid, call_sid)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8765)
