@@ -35,6 +35,8 @@ from mail_handler import send_email
 # from noise_reduce import NoiseReducer
 from transcription import TranscriptHandler
 
+from twilio import get_call_details
+
 from text import text
 
 from loguru import logger
@@ -217,14 +219,18 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             formatted_messages.append(f"{timestamp}{msg['role']}: {msg['content']}")
 
         formatted_transcript = "\n".join(formatted_messages)
+        call_details = get_call_details(call_sid)
 
         email_body = f"""
         Hello,
 
         This is a transcript of a real call between Jessica and a user.
+        call details:
+        {call_details}
 
         Transcript:
         {formatted_transcript}
+    
 
         Best regards,
         Jessica AI Team
