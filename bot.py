@@ -57,7 +57,7 @@ async def send_email_wrapper(
     return send_email(subject, body)
 
 
-async def run_bot(websocket_client, stream_sid):
+async def run_bot(websocket_client, stream_sid, call_sid):
     transport = FastAPIWebsocketTransport(
         websocket=websocket_client,
         params=FastAPIWebsocketParams(
