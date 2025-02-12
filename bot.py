@@ -35,7 +35,7 @@ from mail_handler import send_email
 # from noise_reduce import NoiseReducer
 from transcription import TranscriptHandler
 
-from twilio import get_call_details
+from twilio_helper import get_call_details
 
 from text import text
 
