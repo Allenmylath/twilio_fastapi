@@ -220,13 +220,26 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
         formatted_transcript = "\n".join(formatted_messages)
         call_details = get_call_details(call_sid)
+        formatted_call_details = f"""
+            Call Details:
+            -------------
+            From: {call_details['phone_number']}
+            To: {call_details['to_number']}
+            Duration: {call_details['duration']} seconds
+            Status: {call_details['status'].title()}
+            Direction: {call_details['direction'].title()}
+            Start Time: {call_details['start_time']}
+            End Time: {call_details['end_time']}
+            Line Type: {call_details['line_type'].title()}
+            Caller Name: {call_details['caller_name']}
+            """
 
         email_body = f"""
         Hello,
 
         This is a transcript of a real call between Jessica and a user.
         call details:
-        {call_details}
+        {formatted_call_details}
 
         Transcript:
         {formatted_transcript}
