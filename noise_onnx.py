@@ -56,14 +56,13 @@ class GTCRNNoiseReductionFilter(BaseAudioFilter):
 
     async def process_frame(self, frame: FilterControlFrame):
         """Process control frames - can be extended to handle model-specific controls."""
-        # Currently no specific controls implemented
         pass
 
     async def filter(self, audio: bytes) -> bytes:
-        """Apply noise reduction to the input audio.
+        """Apply noise reduction to a single frame of input audio.
         
         Args:
-            audio: Raw PCM audio bytes
+            audio: Raw PCM audio bytes (single frame)
             
         Returns:
             Processed PCM audio bytes
@@ -83,30 +82,22 @@ class GTCRNNoiseReductionFilter(BaseAudioFilter):
                 return_complex=False
             )[None]  # Add batch dimension
             
-            # Process each frame through the model
+            # Process the frame through the model
             inputs = x.numpy()
-            outputs = []
+            out_frame, self._conv_cache, self._tra_cache, self._inter_cache = \
+                self._session.run(
+                    [], 
+                    {
+                        'mix': inputs[..., :1, :],  # Take single frame
+                        'conv_cache': self._conv_cache,
+                        'tra_cache': self._tra_cache,
+                        'inter_cache': self._inter_cache
+                    }
+                )
             
-            for i in range(inputs.shape[-2]):
-                # Run inference
-                out_i, self._conv_cache, self._tra_cache, self._inter_cache = \
-                    self._session.run(
-                        [], 
-                        {
-                            'mix': inputs[..., i:i + 1, :],
-                            'conv_cache': self._conv_cache,
-                            'tra_cache': self._tra_cache,
-                            'inter_cache': self._inter_cache
-                        }
-                    )
-                outputs.append(out_i)
-            
-            # Combine all outputs
-            outputs = np.concatenate(outputs, axis=2)
-            
-            # Inverse STFT
+            # Inverse STFT for single frame
             enhanced = istft(
-                outputs[..., 0] + 1j * outputs[..., 1],
+                out_frame[..., 0] + 1j * out_frame[..., 1],
                 n_fft=self._n_fft,
                 hop_length=self._hop_length,
                 win_length=self._win_length,
