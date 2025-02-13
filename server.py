@@ -1,7 +1,7 @@
 # main.py
 import json
 import uvicorn
-from bot import run_bot
+from bot2 import run_bot
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from twilio.twiml.voice_response import VoiceResponse, Connect, Stream
