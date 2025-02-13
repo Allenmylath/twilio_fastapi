@@ -123,8 +123,8 @@ Customer Information:
 Name: {customer_name}
 Preferred Contact Schedule: {schedule_info}
     """
-
-    return send_email(subject, enhanced_body)
+    result = send_email(subject, enhanced_body)
+    await callback(result) 
 
 
 # Updated tools list
