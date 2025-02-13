@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import datetime
-from datetime import datetime 
+ 
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
 from pipecat.frames.frames import EndFrame, LLMMessagesFrame
@@ -50,9 +50,7 @@ logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
 
-import datetime
-from datetime import datetime
-from typing import Dict, Any
+
 
 
 async def validate_schedule(date_str: str, time_str: str) -> Dict[str, Any]:
