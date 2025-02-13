@@ -172,7 +172,7 @@ tools = [
                         "description": "Customer's preferred contact schedule that has been validated using the check_schedule function, or note if they declined to provide a schedule. You must use check_schedule to validate any date/time before including it here.",
                     },
                 },
-                "required": ["subject", "body"],
+                "required": ["subject", "body", "customer_name", "schedule_info ],
             },
         },
     ),
