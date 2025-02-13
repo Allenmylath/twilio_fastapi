@@ -80,7 +80,7 @@ async def validate_schedule(date_str: str, time_str: str) -> Dict[str, Any]:
         if time_obj.hour < 9 or time_obj.hour >= 17:
             validation["is_valid"] = False
             validation["reasons"].append("Our business hours are 9 AM to 5 PM")
-
+        logger.info(validation)
         return validation
 
     except ValueError:
@@ -99,6 +99,8 @@ async def check_schedule(
     """
     date_str = arguments.get("date")
     time_str = arguments.get("time")
+    
+ 
     return await validate_schedule(date_str, time_str)
 
 
