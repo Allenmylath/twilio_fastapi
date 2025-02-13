@@ -18,10 +18,10 @@ class GTCRNNoiseReductionFilter(BaseAudioFilter):
         self._session = None
         self._sample_rate = None
         
-        # STFT parameters
-        self._n_fft = 512
-        self._hop_length = 256
-        self._win_length = 512
+        # STFT parameters for 16kHz PCM (20ms frame with 50% overlap)
+        self._n_fft = 320  # 20ms at 16kHz
+        self._hop_length = 160  # 10ms at 16kHz for 50% overlap
+        self._win_length = 320
         self._window = torch.hann_window(self._win_length).pow(0.5)
         
         # Initialize caches
