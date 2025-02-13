@@ -161,7 +161,7 @@ tools = [
                     },
                     "body": {
                         "type": "string",
-                        "description": "Main email content including query and context",
+                        "description": "Main email content including query and context also include customer_name and schedule_info if provided",
                     },
                     "customer_name": {
                         "type": "string",
