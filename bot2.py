@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import datetime
+from typing import Dict, Any
  
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
@@ -58,9 +59,9 @@ async def validate_schedule(date_str: str, time_str: str) -> Dict[str, Any]:
     Validates if the given date and time meet business requirements
     """
     try:
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-        time_obj = datetime.strptime(time_str, "%H:%M").time()
-        datetime_obj = datetime.combine(date_obj, time_obj)
+        date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        time_obj = datetime.datetime.strptime(time_str, "%H:%M").time()
+        datetime_obj = datetime.datetime.combine(date_obj, time_obj)
 
         validation = {
             "is_valid": True,
@@ -68,7 +69,7 @@ async def validate_schedule(date_str: str, time_str: str) -> Dict[str, Any]:
             "reasons": [],
         }
 
-        if datetime_obj < datetime.now():
+        if datetime_obj < datetime.datetime.now():
             validation["is_valid"] = False
             validation["reasons"].append("Date and time cannot be in the past")
 
