@@ -46,6 +46,7 @@ def send_email(subject, body):
         email_init(recipient, subject, body)
 
     print("Bulk email sending completed!")
+    return "Your email request has been processed and our team will review it soon."
 
 
 '''
