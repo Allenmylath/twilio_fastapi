@@ -101,7 +101,8 @@ async def check_schedule(
     time_str = arguments.get("time")
     
  
-    return await validate_schedule(date_str, time_str)
+    result = await validate_schedule(date_str, time_str)
+    await callback(result)
 
 
 async def send_email_with_info(
