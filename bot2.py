@@ -210,8 +210,8 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
     )
     """
-    llm.register_function(None, check_schedule)
-    llm.register_function(None, send_email_with_info)
+    llm.register_function("check_schedule", check_schedule)
+    llm.register_function("send_email_with_info", send_email_with_info)
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     """
