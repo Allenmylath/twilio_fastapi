@@ -20,7 +20,7 @@ class NoiseReducedGladiaSTT(GladiaSTTService):
         api_key: str,
         url: str = "https://api.gladia.io/v2/live",
         confidence: float = 0.5,
-        sample_rate: Optional[int] = None,
+        sample_rate: Optional[int] = 16000,
         params: GladiaSTTService.InputParams = GladiaSTTService.InputParams(),
         **kwargs,
     ):
