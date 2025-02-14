@@ -18,7 +18,7 @@ from pipecat.processors.audio.vad.silero import SileroVAD
 from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from groq import GroqSTTService
-from gladia_nr import NoiseReducedGladiaSTT
+from gladia_nr import GladiaSTTService
 
 from pipecat.services.openai import OpenAILLMService
 
@@ -221,7 +221,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     
-    stt = NoiseReducedGladiaSTT(
+    stt = GladiaSTTService(
         api_key=os.getenv("GLADIA_API_KEY"),
         audio_enhancer=True,
         text_filter=MarkdownTextFilter(),
