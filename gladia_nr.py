@@ -58,6 +58,11 @@ class NoiseReducedGladiaSTT(GladiaSTTService):
 
     async def run_stt(self, audio: bytes) -> AsyncGenerator[Frame, None]:
         """
-        Maintain the same interface as the parent class.
+        Implements the async generator pattern correctly.
+        Processes audio with noise reduction and delegates to parent class.
         """
-        return await super().run_stt(audio)
+        await self.start_processing_metrics()
+        await self._send_audio(audio)
+        await self.stop_processing_metrics()
+        # Using yield to make this an async generator
+        yield None
