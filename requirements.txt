@@ -4,4 +4,5 @@ uvicorn
 python-dotenv
 loguru
 twilio
+noisereduce
 
