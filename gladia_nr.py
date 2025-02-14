@@ -5,7 +5,7 @@ import base64
 import json
 
 from pipecat.frames.frames import Frame
-from .gladia import GladiaSTTService
+from pipecat.services.gladia import GladiaSTTService
 
 class NoiseReducedGladiaSTT(GladiaSTTService):
     """
