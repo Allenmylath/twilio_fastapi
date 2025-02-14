@@ -20,7 +20,6 @@ class NoiseReducedGladiaSTT(GladiaSTTService):
         api_key: str,
         url: str = "https://api.gladia.io/v2/live",
         confidence: float = 0.5,
-        sample_rate: Optional[int] = 16000,
         params: GladiaSTTService.InputParams = GladiaSTTService.InputParams(),
         **kwargs,
     ):
@@ -28,7 +27,6 @@ class NoiseReducedGladiaSTT(GladiaSTTService):
             api_key=api_key,
             url=url,
             confidence=confidence,
-            sample_rate=sample_rate,
             params=params,
             **kwargs
         )
@@ -46,7 +44,7 @@ class NoiseReducedGladiaSTT(GladiaSTTService):
         data = data.astype(np.float32) + epsilon
         
         # Apply noise reduction
-        reduced_noise = nr.reduce_noise(y=data, sr=self.sample_rate)
+        reduced_noise = nr.reduce_noise(y=data, sr=16000)
         
         # Convert back to int16 audio bytes, clipping to prevent overflow
         processed_audio = np.clip(reduced_noise, -32768, 32767).astype(np.int16).tobytes()
