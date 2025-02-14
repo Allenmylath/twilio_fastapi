@@ -50,6 +50,10 @@ load_dotenv(override=True)
 logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
+date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+
 
 
 
@@ -172,7 +176,7 @@ tools = [
                     },
                     "schedule_info": {
                         "type": "string",
-                        "description": "Customer's preferred contact schedule that has been validated using the check_schedule function, or note if they declined to provide a schedule. You must use check_schedule to validate any date/time before including it here.",
+                        "description": f"today is {date_time_now}.Customer's preferred contact schedule that has been validated using the check_schedule function,  or note if they declined to provide a schedule. You must use check_schedule to validate any date/time before including it here.",
                     },
                 },
                 "required": ["subject", "body", "customer_name", "schedule_info" ],
