@@ -221,7 +221,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     
-    stt = GladiaSTTService(
+    stt = NoiseReducedGladiaSTT(
         api_key=os.getenv("GLADIA_API_KEY"),
         audio_enhancer=True,
         text_filter=MarkdownTextFilter(),
