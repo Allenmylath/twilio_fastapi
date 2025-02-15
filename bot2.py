@@ -325,7 +325,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         ]
     )
 
-      task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=True))
+      task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=True,enable_metrics=True,))
 
       @transcript.event_handler("on_transcript_update")
       async def on_transcript_update(processor, frame):
