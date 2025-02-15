@@ -193,57 +193,58 @@ tools = [
 
 
 async def run_bot(websocket_client, stream_sid, call_sid):
-    transport = FastAPIWebsocketTransport(
-        websocket=websocket_client,
-        params=FastAPIWebsocketParams(
-            audio_out_enabled=True,
-            audio_in_enabled=True,
-            add_wav_header=False,
-            vad_enabled=True,
-            vad_analyzer=SileroVADAnalyzer(),
-            vad_audio_passthrough=True,
-            serializer=TwilioFrameSerializer(stream_sid),
-            #audio_in_filter=KoalaFilter(access_key=os.getenv("KOALA_ACCESS_KEY")),
-        ),
-    )
+     async with aiohttp.ClientSession() as session:
+         transport = FastAPIWebsocketTransport(
+             websocket=websocket_client,
+             params=FastAPIWebsocketParams(
+             audio_out_enabled=True,
+             audio_in_enabled=True,
+             add_wav_header=False,
+             vad_enabled=True,
+             vad_analyzer=SileroVADAnalyzer(),
+             vad_audio_passthrough=True,
+             serializer=TwilioFrameSerializer(stream_sid),
+             #audio_in_filter=KoalaFilter(access_key=os.getenv("KOALA_ACCESS_KEY")),
+         ),
+     )
     # nr = NoiseReducer()
 
-    llm = OpenAILLMService(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-4o-mini",
-        temperature=0,
-        max_tokens=300,
-    )
+     llm = OpenAILLMService(
+         api_key=os.getenv("OPENAI_API_KEY"),
+         model="gpt-4o-mini",
+         temperature=0,
+         max_tokens=300,
+     )
     """
     llm = GroqLLMService(
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
     )
     """
-    llm.register_function("check_schedule", check_schedule)
-    llm.register_function("send_email_with_info", send_email_with_info)
+     llm.register_function("check_schedule", check_schedule)
+     llm.register_function("send_email_with_info", send_email_with_info)
 
-    # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
+     # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     
-    stt = GladiaSTTService(
-        api_key=os.getenv("GLADIA_API_KEY"),
-        audio_enhancer=True,
+     stt = GladiaSTTService(
+         api_key=os.getenv("GLADIA_API_KEY"),
+         audio_enhancer=True,
         
-    )
-    """
-    stt = GroqSTTService(
-        api_key=os.getenv("GROQ_API_KEY"), model="whisper-large-v3-turbo"
-    )
-    """
+     )
+     """
+     stt = GroqSTTService(
+         api_key=os.getenv("GROQ_API_KEY"), model="whisper-large-v3-turbo"
+     )
+     """
 
-    tts = CartesiaTTSService(
-        api_key=os.getenv("CARTESIA_API_KEY"),
-        voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
-        text_filter=MarkdownTextFilter(),
-    )
-    vad = SileroVAD()
+     tts = CartesiaTTSService(
+         api_key=os.getenv("CARTESIA_API_KEY"),
+         voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
+         text_filter=MarkdownTextFilter(),
+     )
+     vad = SileroVAD()
     
-    messages = [
-        {
+     messages = [
+         {
             "role": "system",
             "content": (
                 "You are a helpful assistant named Jessica at CARE ADHD. "
