@@ -294,6 +294,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
     context_aggregator = llm.create_context_aggregator(context)
     transcript = TranscriptProcessor()
     transcript_handler = TranscriptHandler()
+    audio_buffer_processor = AudioBufferProcessor(num_channels=2)
     canonical = CanonicalMetricsService(
             audio_buffer_processor=audio_buffer_processor,
             aiohttp_session=session,
@@ -314,8 +315,10 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             context_aggregator.user(),
             llm,  # LLM
             tts,  # Text-To-Speech
-            transport.output(),  # Websocket output to client
+            transport.output(),  
             transcript.assistant(),
+            audio_buffer_processor,  
+            canonical, 
             context_aggregator.assistant(),
         ]
     )
