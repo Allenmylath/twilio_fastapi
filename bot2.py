@@ -3,6 +3,7 @@ import sys
 import json
 import uuid
 import datetime
+import aiohttp
 from typing import Dict, Any
  
 
@@ -193,8 +194,8 @@ tools = [
 
 
 async def run_bot(websocket_client, stream_sid, call_sid):
-     async with aiohttp.ClientSession() as session:
-         transport = FastAPIWebsocketTransport(
+  async with aiohttp.ClientSession() as session:
+      transport = FastAPIWebsocketTransport(
              websocket=websocket_client,
              params=FastAPIWebsocketParams(
              audio_out_enabled=True,
@@ -209,41 +210,41 @@ async def run_bot(websocket_client, stream_sid, call_sid):
      )
     # nr = NoiseReducer()
 
-     llm = OpenAILLMService(
+      llm = OpenAILLMService(
          api_key=os.getenv("OPENAI_API_KEY"),
          model="gpt-4o-mini",
          temperature=0,
          max_tokens=300,
      )
-    """
-    llm = GroqLLMService(
+      """
+       llm = GroqLLMService(
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
-    )
-    """
-     llm.register_function("check_schedule", check_schedule)
-     llm.register_function("send_email_with_info", send_email_with_info)
+       )
+      """
+      llm.register_function("check_schedule", check_schedule)
+      llm.register_function("send_email_with_info", send_email_with_info)
 
      # stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
     
-     stt = GladiaSTTService(
+      stt = GladiaSTTService(
          api_key=os.getenv("GLADIA_API_KEY"),
          audio_enhancer=True,
         
      )
-     """
+      """
      stt = GroqSTTService(
          api_key=os.getenv("GROQ_API_KEY"), model="whisper-large-v3-turbo"
      )
      """
 
-     tts = CartesiaTTSService(
+      tts = CartesiaTTSService(
          api_key=os.getenv("CARTESIA_API_KEY"),
          voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
          text_filter=MarkdownTextFilter(),
      )
-     vad = SileroVAD()
+      vad = SileroVAD()
     
-     messages = [
+      messages = [
          {
             "role": "system",
             "content": (
@@ -291,12 +292,12 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         }
     ]
 
-    context = OpenAILLMContext(messages, tools)
-    context_aggregator = llm.create_context_aggregator(context)
-    transcript = TranscriptProcessor()
-    transcript_handler = TranscriptHandler()
-    audio_buffer_processor = AudioBufferProcessor(num_channels=2)
-    canonical = CanonicalMetricsService(
+      context = OpenAILLMContext(messages, tools)
+      context_aggregator = llm.create_context_aggregator(context)
+      transcript = TranscriptProcessor()
+      transcript_handler = TranscriptHandler()
+      audio_buffer_processor = AudioBufferProcessor(num_channels=2)
+      canonical = CanonicalMetricsService(
             audio_buffer_processor=audio_buffer_processor,
             aiohttp_session=session,
             api_key=os.getenv("CANONICAL_API_KEY"),
@@ -306,7 +307,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             context=context,
         )
 
-    pipeline = Pipeline(
+      pipeline = Pipeline(
         [
             transport.input(),  # Websocket input from client
             # nr,
@@ -324,14 +325,14 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         ]
     )
 
-    task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=True))
+      task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=True))
 
-    @transcript.event_handler("on_transcript_update")
-    async def on_transcript_update(processor, frame):
+      @transcript.event_handler("on_transcript_update")
+      async def on_transcript_update(processor, frame):
         await transcript_handler.on_transcript_update(processor, frame)
 
-    @transport.event_handler("on_client_connected")
-    async def on_client_connected(transport, client):
+      @transport.event_handler("on_client_connected")
+      async def on_client_connected(transport, client):
         """
         # Kick off the conversation.
         messages.append(
@@ -341,8 +342,8 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
 
-    @transport.event_handler("on_client_disconnected")
-    async def on_client_disconnected(transport, client):
+      @transport.event_handler("on_client_disconnected")
+      async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
 
         # Get transcript data from the handler
@@ -398,6 +399,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         send_email(email_subject, email_body)
         await task.queue_frames([EndFrame()])
 
-    runner = PipelineRunner(handle_sigint=False)
+      runner = PipelineRunner(handle_sigint=False)
 
-    await runner.run(task)
+      await runner.run(task)
