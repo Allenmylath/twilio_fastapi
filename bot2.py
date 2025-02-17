@@ -55,7 +55,8 @@ load_dotenv(override=True)
 logger.remove(0)
 logger.add(sys.stderr, level="DEBUG")
 
-date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %A %H:%M:%S")
 
 
 
