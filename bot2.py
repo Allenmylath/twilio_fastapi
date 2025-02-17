@@ -18,7 +18,6 @@ from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
 from pipecat.processors.aggregators.openai_llm_context import CustomEncoder
 from pipecat.processors.audio.vad.silero import SileroVAD
 from pipecat.processors.audio.audio_buffer_processor import AudioBufferProcessor
-from pipecat.services.canonical import CanonicalMetricsService
 from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from groq import GroqSTTService
@@ -298,16 +297,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       context_aggregator = llm.create_context_aggregator(context)
       transcript = TranscriptProcessor()
       transcript_handler = TranscriptHandler()
-      audio_buffer_processor = AudioBufferProcessor(num_channels=2)
-      canonical = CanonicalMetricsService(
-            audio_buffer_processor=audio_buffer_processor,
-            aiohttp_session=session,
-            api_key=os.getenv("CANONICAL_API_KEY"),
-            call_id=str(uuid.uuid4()),
-            assistant="pipecat-chatbot",
-            assistant_speaks_first=True,
-            context=context,
-        )
+     
 
       pipeline = Pipeline(
         [
@@ -321,8 +311,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             tts,  # Text-To-Speech
             transport.output(),  
             transcript.assistant(),
-            audio_buffer_processor,  
-            canonical, 
             context_aggregator.assistant(),
         ]
     )
