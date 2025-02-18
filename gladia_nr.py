@@ -166,6 +166,7 @@ class GladiaSTTService(STTService):
                 else [],
                 "code_switching": False,
             },
+            "model": "accurate",
             "endpointing": params.endpointing,
             "maximum_duration_without_endpointing": params.maximum_duration_without_endpointing,
             "pre_processing": {
