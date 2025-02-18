@@ -136,8 +136,8 @@ def language_to_gladia_language(language: Language) -> Optional[str]:
 class GladiaSTTService(STTService):
     class InputParams(BaseModel):
         language: Optional[Language] = Language.EN
-        endpointing: Optional[float] = 0.1
-        maximum_duration_without_endpointing: Optional[int] = 7
+        endpointing: Optional[float] = 0.2
+        maximum_duration_without_endpointing: Optional[int] = 10
         audio_enhancer: Optional[bool] = None
         words_accurate_timestamps: Optional[bool] = None
 
