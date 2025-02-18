@@ -228,7 +228,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
     
       stt = GladiaSTTService(
          api_key=os.getenv("GLADIA_API_KEY"),
-         audio_enhancer=True,
+         audio_enhancer=False,
         
      )
       """
