@@ -146,7 +146,7 @@ class GladiaSTTService(STTService):
         *,
         api_key: str,
         url: str = "https://api.gladia.io/v2/live",
-        confidence: float = 0.5,
+        confidence: float = 0.65,
         sample_rate: Optional[int] = None,
         params: InputParams = InputParams(),
         **kwargs,
