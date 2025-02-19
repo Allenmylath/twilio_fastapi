@@ -305,8 +305,8 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             llm,  # LLM
             tts,  # Text-To-Speech
             transport.output(),  
-            transcript.assistant(),
             audio_buffer,
+            transcript.assistant(),
             context_aggregator.assistant(),
         ]
     )
