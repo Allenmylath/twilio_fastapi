@@ -294,6 +294,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       transcript = TranscriptProcessor()
       transcript_handler = TranscriptHandler()
       audio_buffer = AudioBufferProcessor()
+      logger.info("AudioBufferProcessor initialized")
      
 
       pipeline = Pipeline(
@@ -315,15 +316,17 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
       @audio_buffer.event_handler("on_audio_data")
       async def on_audio_data(buffer, audio, sample_rate, num_channels):
-       try:
-         await save_audio_to_s3(
-            audio=audio,
-            sample_rate=sample_rate,
-            num_channels=num_channels,
-            bucket_name="careadhdaudio"
-         )
-       except Exception as e:
-         print(f"Error saving audio to S3: {e}")
+        logger.info(f"Audio data received: {len(audio)} bytes, sample_rate={sample_rate}, channels={num_channels}")
+        try:
+          await save_audio_to_s3(
+             audio=audio,
+             sample_rate=sample_rate,
+             num_channels=num_channels,
+             bucket_name="careadhdaudio"
+          )
+          logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
+        except Exception as e:
+          logger.error(f"Error saving audio to S3: {e}")
         
 
       @transcript.event_handler("on_transcript_update")
@@ -340,7 +343,9 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         await task.queue_frames([LLMMessagesFrame(messages)])
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
+        logger.info("Starting audio recording")
         await audio_buffer.start_recording()
+        logger.info("Audio recording started successfully")
 
       @transport.event_handler("on_client_disconnected")
       async def on_client_disconnected(transport, client):
