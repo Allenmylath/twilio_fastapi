@@ -6,6 +6,8 @@
 
 import asyncio
 from typing import AsyncGenerator, Dict, Optional
+import numpy as np
+import noisereduce as nr
 
 from loguru import logger
 
@@ -197,6 +199,17 @@ class DeepgramSTTService(STTService):
         await self._disconnect()
 
     async def run_stt(self, audio: bytes) -> AsyncGenerator[Frame, None]:
+        data = np.frombuffer(audio, dtype=np.int16)
+        
+        # Add a small epsilon to avoid division by zero
+        epsilon = 1e-10
+        data = data.astype(np.float32) + epsilon
+        
+        # Apply noise reduction
+        reduced_noise = nr.reduce_noise(y=data, sr=self.sample_rate)
+        
+        # Convert back to int16 audio bytes, clipping to prevent overflow
+        processed_audio = np.clip(reduced_noise, -32768, 32767).astype(np.int16).tobytes()
         await self._connection.send(audio)
         yield None
 
