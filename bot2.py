@@ -340,6 +340,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         await task.queue_frames([LLMMessagesFrame(messages)])
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
+        await audio_buffer.start_recording()
 
       @transport.event_handler("on_client_disconnected")
       async def on_client_disconnected(transport, client):
