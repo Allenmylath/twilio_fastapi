@@ -206,7 +206,7 @@ class DeepgramSTTService(STTService):
         data = data.astype(np.float32) + epsilon
         
         # Apply noise reduction
-        reduced_noise = nr.reduce_noise(y=data, sr=self.sample_rate)
+        reduced_noise = nr.reduce_noise(y=data, sr=16000)
         
         # Convert back to int16 audio bytes, clipping to prevent overflow
         processed_audio = np.clip(reduced_noise, -32768, 32767).astype(np.int16).tobytes()
