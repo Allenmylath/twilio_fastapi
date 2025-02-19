@@ -127,6 +127,7 @@ class DeepgramSTTService(STTService):
         **kwargs,
     ):
         super().__init__(sample_rate=sample_rate, **kwargs)
+        self.sample_rate = sample_rate
 
         default_options = LiveOptions(
             encoding="linear16",
