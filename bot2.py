@@ -34,7 +34,7 @@ from pipecat.transports.network.fastapi_websocket import (
     FastAPIWebsocketParams,
 )
 from pipecat.serializers.twilio import TwilioFrameSerializer
-from pipecat.audio.filters.koala_filter import KoalaFilter
+
 
 # from noise_reduce import NoisereduceFilter
 from mail_handler import send_email
