@@ -1,4 +1,4 @@
-pipecat-ai[cartesia,openai,silero,koala,gladia,canonical]==0.0.54
+pipecat-ai[cartesia,openai,silero,deepgram]==0.0.54
 fastapi
 uvicorn
 python-dotenv
