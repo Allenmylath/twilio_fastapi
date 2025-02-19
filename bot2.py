@@ -320,7 +320,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         audio=audio,
         sample_rate=sample_rate,
         num_channels=num_channels,
-        bucket_name="your-bucket-name"
+        bucket_name="careadhdaudio"
        )
 
       @transcript.event_handler("on_transcript_update")
