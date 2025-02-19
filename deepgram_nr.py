@@ -121,7 +121,7 @@ class DeepgramSTTService(STTService):
         *,
         api_key: str,
         url: str = "",
-        sample_rate: Optional[int] = None,
+        sample_rate: Optional[int] = 16000,
         live_options: Optional[LiveOptions] = None,
         addons: Optional[Dict] = None,
         **kwargs,
