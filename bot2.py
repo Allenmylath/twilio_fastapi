@@ -20,7 +20,6 @@ from pipecat.processors.audio.vad.silero import SileroVAD
 from pipecat.processors.audio.audio_buffer_processor import AudioBufferProcessor
 from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
-from pipecat.processors.aggregators import SentenceAggregator
 from groq import GroqSTTService
 from gladia_nr import GladiaSTTService
 
@@ -229,7 +228,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
          audio_enhancer=False,
         
       )
-      sa = from SentenceAggregator()
+      
    
       
 
@@ -299,7 +298,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         [
             transport.input(),  # Websocket input from client
             stt,  # Speech-To-Text
-            sa,
             transcript.user(),
             context_aggregator.user(),
             llm,  # LLM
