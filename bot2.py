@@ -296,7 +296,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       context_aggregator = llm.create_context_aggregator(context)
       transcript = TranscriptProcessor()
       transcript_handler = TranscriptHandler()
-      audio_buffer = AudioBufferProcessor()
+      audiobuffer = AudioBufferProcessor()
       logger.info("AudioBufferProcessor initialized")
      
 
@@ -309,7 +309,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             llm,  # LLM
             tts,  # Text-To-Speech
             transport.output(),  
-            audio_buffer,
+            audiobuffer,
             transcript.assistant(),
             context_aggregator.assistant(),
         ]
@@ -347,14 +347,14 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         """
         await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
         logger.info("Starting audio recording")
-        await audio_buffer.start_recording()
+        await audiobuffer.start_recording()
         logger.info("Audio recording started successfully")
 
       @transport.event_handler("on_client_disconnected")
       async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
         logger.info("Call ended. Beginning audio recording shutdown")
-        await audio_buffer.stop_recording()
+        await audiobuffer.stop_recording()
         logger.info("Audio recording stopped successfully")
 
         # Get transcript data from the handler
