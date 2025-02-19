@@ -225,7 +225,10 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       llm.register_function("check_schedule", check_schedule)
       llm.register_function("send_email_with_info", send_email_with_info)
 
-      stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
+      stt = DeepgramSTTService(
+      api_key=os.getenv("DEEPGRAM_API_KEY"),
+      sample_rate=16000
+      )
       """
       stt = GladiaSTTService(
          api_key=os.getenv("GLADIA_API_KEY"),
