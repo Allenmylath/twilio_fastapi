@@ -315,13 +315,16 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
       @audio_buffer.event_handler("on_audio_data")
       async def on_audio_data(buffer, audio, sample_rate, num_channels):
-      
-       await save_audio_to_s3(
-        audio=audio,
-        sample_rate=sample_rate,
-        num_channels=num_channels,
-        bucket_name="careadhdaudio"
-       )
+       try:
+         await save_audio_to_s3(
+            audio=audio,
+            sample_rate=sample_rate,
+            num_channels=num_channels,
+            bucket_name="careadhdaudio"
+         )
+       except Exception as e:
+         print(f"Error saving audio to S3: {e}")
+        
 
       @transcript.event_handler("on_transcript_update")
       async def on_transcript_update(processor, frame):
