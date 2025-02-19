@@ -293,7 +293,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       context_aggregator = llm.create_context_aggregator(context)
       transcript = TranscriptProcessor()
       transcript_handler = TranscriptHandler()
-      audio_buffer = AudioBufferProcessor(buffer_size=0)
+      audio_buffer = AudioBufferProcessor()
      
 
       pipeline = Pipeline(
