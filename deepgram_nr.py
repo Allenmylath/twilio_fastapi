@@ -56,7 +56,7 @@ class DeepgramTTSService(TTSService):
         *,
         api_key: str,
         voice: str = "aura-helios-en",
-        sample_rate: Optional[int] = None,
+        sample_rate: Optional[int] = 16000, 
         encoding: str = "linear16",
         **kwargs,
     ):
