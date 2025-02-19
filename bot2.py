@@ -22,7 +22,7 @@ from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from groq import GroqSTTService
 from gladia_nr import GladiaSTTService
-from deepgram_nr import DeepgramSTTService
+
 
 from pipecat.services.openai import OpenAILLMService
 
@@ -36,7 +36,7 @@ from pipecat.transports.network.fastapi_websocket import (
 from pipecat.serializers.twilio import TwilioFrameSerializer
 
 
-# from noise_reduce import NoisereduceFilter
+
 from mail_handler import send_email
 
 # from noise_reduce import NoiseReducer
@@ -205,7 +205,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
              serializer=TwilioFrameSerializer(stream_sid),
          ),
      )
-    # nr = NoiseReducer()
+   
 
       llm = OpenAILLMService(
          api_key=os.getenv("OPENAI_API_KEY"),
@@ -221,28 +221,22 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       llm.register_function("check_schedule", check_schedule)
       llm.register_function("send_email_with_info", send_email_with_info)
 
-      stt = DeepgramSTTService(
-      api_key=os.getenv("DEEPGRAM_API_KEY"),
-      sample_rate=16000
-      )
-      """
+ 
+     
       stt = GladiaSTTService(
          api_key=os.getenv("GLADIA_API_KEY"),
          audio_enhancer=False,
         
       )
    
-      stt = GroqSTTService(
-         api_key=os.getenv("GROQ_API_KEY"), model="whisper-large-v3-turbo"
-      )
-      """
+      
 
       tts = CartesiaTTSService(
          api_key=os.getenv("CARTESIA_API_KEY"),
          voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
          text_filter=MarkdownTextFilter(),
      )
-      vad = SileroVAD()
+     
     
       messages = [
          {
@@ -302,8 +296,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       pipeline = Pipeline(
         [
             transport.input(),  # Websocket input from client
-            # nr,
-            # vad,
             stt,  # Speech-To-Text
             transcript.user(),
             context_aggregator.user(),
