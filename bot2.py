@@ -22,6 +22,7 @@ from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from groq import GroqSTTService
 from gladia_nr import GladiaSTTService
+from deepgra_nr import DeepgramSTTService
 
 from pipecat.services.openai import OpenAILLMService
 
