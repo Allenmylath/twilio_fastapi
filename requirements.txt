@@ -5,4 +5,5 @@ python-dotenv
 loguru
 twilio
 noisereduce
+aioboto3
 
