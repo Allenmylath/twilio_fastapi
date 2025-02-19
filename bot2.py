@@ -41,6 +41,7 @@ from mail_handler import send_email
 
 # from noise_reduce import NoiseReducer
 from transcription import TranscriptHandler
+from audio_s3 import save_audio_to_s3
 
 from twilio_helper import get_call_details
 
@@ -292,6 +293,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       context_aggregator = llm.create_context_aggregator(context)
       transcript = TranscriptProcessor()
       transcript_handler = TranscriptHandler()
+      audio_buffer = AudioBufferProcessor(buffer_size=0)
      
 
       pipeline = Pipeline(
@@ -304,11 +306,22 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             tts,  # Text-To-Speech
             transport.output(),  
             transcript.assistant(),
+            audio_buffer,
             context_aggregator.assistant(),
         ]
     )
 
       task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=False,enable_metrics=True,))
+
+      @audio_buffer.event_handler("on_audio_data")
+      async def on_audio_data(buffer, audio, sample_rate, num_channels):
+      
+       await save_audio_to_s3(
+        audio=audio,
+        sample_rate=sample_rate,
+        num_channels=num_channels,
+        bucket_name="your-bucket-name"
+       )
 
       @transcript.event_handler("on_transcript_update")
       async def on_transcript_update(processor, frame):
