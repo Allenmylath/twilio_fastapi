@@ -345,6 +345,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       @transport.event_handler("on_client_disconnected")
       async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
+        await audio_buffer.stop_recording()
 
         # Get transcript data from the handler
         transcript_data = transcript_handler.get_transcript()
