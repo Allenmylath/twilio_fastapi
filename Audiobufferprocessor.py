@@ -43,7 +43,7 @@ class AudioBufferProcessor(FrameProcessor):
         *,
         sample_rate: Optional[int] = None,
         num_channels: int = 1,
-        buffer_size: int = 0,
+        buffer_size: int = 10*1024*1024,
         user_continuous_stream: bool = True,
         **kwargs,
     ):
