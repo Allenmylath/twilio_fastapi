@@ -233,7 +233,17 @@ class GladiaSTTService(STTService):
         data = data.astype(np.float32) + epsilon
         
         # Apply noise reduction
-        reduced_noise = nr.reduce_noise(y=data, sr=16000,prop_decrease=.25,stationary=False,)
+        # Optimized parameters for 20ms voice frames
+        reduced_noise = nr.reduce_noise(
+            y=data,
+            sr=16000,
+            prop_decrease=0.8,      # Balance between noise reduction and voice preservation
+            stationary=False,       # Better for speech with varying background noise
+            n_fft=512,              # ~32ms at 16kHz - slightly larger than frame for better frequency resolution
+            win_length=400,         # ~25ms - slightly larger than your frame size
+            hop_length=160,         # 10ms (50% overlap with 20ms frames)
+            thresh_n_mult_nonstat=1.3  # Moderate threshold to preserve speech characteristics
+        )
         
         # Convert back to int16 audio bytes, clipping to prevent overflow
         processed_audio = np.clip(reduced_noise, -32768, 32767).astype(np.int16).tobytes()
