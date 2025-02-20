@@ -318,11 +318,11 @@ async def run_bot(websocket_client, stream_sid, call_sid):
     )
 
       task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=False,enable_metrics=True,))
-   
+      s3_url="not available"
       @audiobuffer.event_handler("on_audio_data")
       async def on_audio_data(buffer, audio, sample_rate, num_channels):
         try:
-          await save_audio_to_s3(
+          s3_url = await save_audio_to_s3(
              audio=audio,
              sample_rate=sample_rate,
              num_channels=num_channels,
@@ -387,6 +387,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             End Time: {call_details['end_time']}
             Line Type: {call_details['line_type'].title()}
             Caller Name: {call_details['caller_name']}
+            Recording_url:{s3_url}
             """
 
         email_body = f"""
