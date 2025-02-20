@@ -356,6 +356,17 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         logger.info("Call ended. Beginning audio recording shutdown")
         await audiobuffer.stop_recording()
         logger.info("Audio recording stopped successfully")
+        logger.info(f"Audio data received: {len(audio)} bytes, sample_rate={sample_rate}, channels={num_channels}")
+        try:
+          await save_audio_to_s3(
+             audio=audio,
+             sample_rate=sample_rate,
+             num_channels=num_channels,
+             bucket_name="careadhdaudio"
+          )
+          logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
+        except Exception as e:
+          logger.error(f"Error saving audio to S3: {e}")
 
         # Get transcript data from the handler
         transcript_data = transcript_handler.get_transcript()
