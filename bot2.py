@@ -317,7 +317,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
       task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=False,enable_metrics=True,))
 
-      @audio_buffer.event_handler("on_audio_data")
+      @audiobuffer.event_handler("on_audio_data")
       async def on_audio_data(buffer, audio, sample_rate, num_channels):
         logger.info(f"Audio data received: {len(audio)} bytes, sample_rate={sample_rate}, channels={num_channels}")
         try:
