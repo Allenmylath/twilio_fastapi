@@ -237,7 +237,7 @@ class GladiaSTTService(STTService):
         reduced_noise = nr.reduce_noise(
             y=data,
             sr=16000,
-            prop_decrease=0.5,      # Balance between noise reduction and voice preservation
+            prop_decrease=0.25,      # Balance between noise reduction and voice preservation
             stationary=False,       # Better for speech with varying background noise
             n_fft=512,              # ~32ms at 16kHz - slightly larger than frame for better frequency resolution
             win_length=400,         # ~25ms - slightly larger than your frame size
