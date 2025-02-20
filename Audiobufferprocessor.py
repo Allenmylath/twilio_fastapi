@@ -168,19 +168,12 @@ class AudioBufferProcessor(FrameProcessor):
         self._reset_audio_buffers()
       
     def get_audio(self) -> tuple[bytes, int, int]:
-    """Returns the current mixed audio from the buffer, along with sample rate and channel count.
     
-    Returns:
-        tuple[bytes, int, int]: A tuple containing:
-            - The mixed audio data (bytes)
-            - The sample rate (int)
-            - The number of channels (int)
-    """
-    if not self.has_audio():
-        return b"", self._sample_rate, self._num_channels
+        if not self.has_audio():
+            return b"", self._sample_rate, self._num_channels
         
-    merged_audio = self.merge_audio_buffers()
-    return merged_audio, self._sample_rate, self._num_channels
+        merged_audio = self.merge_audio_buffers()
+        return merged_audio, self._sample_rate, self._num_channels
 
     def _buffer_has_audio(self, buffer: bytearray) -> bool:
         return buffer is not None and len(buffer) > 0
