@@ -355,19 +355,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       @transport.event_handler("on_client_disconnected")
       async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
-        audio, sample_rate, num_channels = audiobuffer.get_audio()
-        logger.info(f"Audio data received: {len(audio)} bytes, sample_rate={sample_rate}, channels={num_channels}")
-        try:
-          await save_audio_to_s3(
-             audio=audio,
-             sample_rate=sample_rate,
-             num_channels=num_channels,
-             bucket_name="careadhdaudio"
-          )
-          logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
-        except Exception as e:
-          logger.error(f"Error saving audio to S3: {e}")
-
         # Get transcript data from the handler
         transcript_data = transcript_handler.get_transcript()
         conversation_messages = transcript_data["messages"]
