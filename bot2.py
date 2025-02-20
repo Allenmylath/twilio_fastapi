@@ -317,20 +317,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
       task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=False,enable_metrics=True,))
 
-      @audiobuffer.event_handler("on_audio_data")
-      async def on_audio_data(buffer, audio, sample_rate, num_channels):
-        logger.info(f"Audio data received: {len(audio)} bytes, sample_rate={sample_rate}, channels={num_channels}")
-        try:
-          await save_audio_to_s3(
-             audio=audio,
-             sample_rate=sample_rate,
-             num_channels=num_channels,
-             bucket_name="careadhdaudio"
-          )
-          logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
-        except Exception as e:
-          logger.error(f"Error saving audio to S3: {e}")
-        
+              
 
       @transcript.event_handler("on_transcript_update")
       async def on_transcript_update(processor, frame):
@@ -356,6 +343,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         logger.info("Call ended. Beginning audio recording shutdown")
         await audiobuffer.stop_recording()
         logger.info("Audio recording stopped successfully")
+        audio, sample_rate, num_channels = audiobuffer.get_audio()
         logger.info(f"Audio data received: {len(audio)} bytes, sample_rate={sample_rate}, channels={num_channels}")
         try:
           await save_audio_to_s3(
