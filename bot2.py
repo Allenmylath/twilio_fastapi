@@ -2,10 +2,11 @@ import os
 import sys
 import json
 import uuid
+import asyncio
 import datetime
 import aiohttp
 from typing import Dict, Any
- 
+
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
 from pipecat.frames.frames import EndFrame, LLMMessagesFrame
@@ -36,7 +37,6 @@ from pipecat.transports.network.fastapi_websocket import (
 from pipecat.serializers.twilio import TwilioFrameSerializer
 
 
-
 from mail_handler import send_email
 
 # from noise_reduce import NoiseReducer
@@ -58,11 +58,6 @@ logger.add(sys.stderr, level="DEBUG")
 
 
 date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %A %H:%M:%S")
-
-
-
-
-
 
 
 async def validate_schedule(date_str: str, time_str: str) -> Dict[str, Any]:
@@ -110,8 +105,7 @@ async def check_schedule(
     """
     date_str = arguments.get("date")
     time_str = arguments.get("time")
-    
- 
+
     result = await validate_schedule(date_str, time_str)
     await callback(result)
 
@@ -135,7 +129,7 @@ Name: {customer_name}
 Preferred Contact Schedule: {schedule_info}
     """
     result = send_email(subject, enhanced_body)
-    await callback(result) 
+    await callback(result)
 
 
 # Updated tools list
@@ -186,206 +180,202 @@ tools = [
                         "description": f"today is {date_time_now}.Customer's preferred contact schedule that has been validated using the check_schedule function,  or note if they declined to provide a schedule. You must use check_schedule to validate any date/time before including it here.",
                     },
                 },
-                "required": ["subject", "body", "customer_name", "schedule_info" ],
+                "required": ["subject", "body", "customer_name", "schedule_info"],
             },
         },
     ),
 ]
 
 
-
-
 async def run_bot(websocket_client, stream_sid, call_sid):
-  async with aiohttp.ClientSession() as session:
-      transport = FastAPIWebsocketTransport(
-             websocket=websocket_client,
-             params=FastAPIWebsocketParams(
-             audio_out_enabled=True,
-             audio_in_enabled=True,
-             add_wav_header=False,
-             vad_enabled=True,
-             vad_audio_passthrough=True,
-             vad_analyzer=SileroVADAnalyzer(),
-             serializer=TwilioFrameSerializer(stream_sid),
-         ),
-     )
-   
+    async with aiohttp.ClientSession() as session:
+        transport = FastAPIWebsocketTransport(
+            websocket=websocket_client,
+            params=FastAPIWebsocketParams(
+                audio_out_enabled=True,
+                audio_in_enabled=True,
+                add_wav_header=False,
+                vad_enabled=True,
+                vad_audio_passthrough=True,
+                vad_analyzer=SileroVADAnalyzer(),
+                serializer=TwilioFrameSerializer(stream_sid),
+            ),
+        )
 
-      llm = OpenAILLMService(
-         api_key=os.getenv("OPENAI_API_KEY"),
-         model="gpt-4o-mini",
-         temperature=0,
-         max_tokens=300,
-     )
-      """
+        llm = OpenAILLMService(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            model="gpt-4o-mini",
+            temperature=0,
+            max_tokens=300,
+        )
+        """
        llm = GroqLLMService(
         api_key=os.getenv("GROQ_API_KEY"), model="llama3-groq-70b-8192-tool-use-preview"
        )
       """
-      llm.register_function("check_schedule", check_schedule)
-      llm.register_function("send_email_with_info", send_email_with_info)
+        llm.register_function("check_schedule", check_schedule)
+        llm.register_function("send_email_with_info", send_email_with_info)
 
- 
-     
-      stt = GladiaSTTService(
-         api_key=os.getenv("GLADIA_API_KEY"),
-         audio_enhancer=False,
-         audio_passthrough=True,
-        
-      )
-      
-   
-      
+        stt = GladiaSTTService(
+            api_key=os.getenv("GLADIA_API_KEY"),
+            audio_enhancer=False,
+            audio_passthrough=True,
+        )
 
-      tts = CartesiaTTSService(
-         api_key=os.getenv("CARTESIA_API_KEY"),
-         voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
-         text_filter=MarkdownTextFilter(),
-         #push_silence_after_stop=testing,
-     )
-     
-    
-      messages = [
-         {
-            "role": "system",
-            "content": (
-                "You are a helpful assistant named Jessica at CARE ADHD. "
-                f"Today's date is {date_time_now}"
-                "Your output will be converted to audio, so avoid using special characters in your answers. "
-                "Keep responses brief and conversational as they will be heard, not read. "
-                "You should be warm and supportive while maintaining professional boundaries. "
-                "You can assist with: "
-                "- General information about ADHD support programs "
-                "- Basic service inquiries "
-                "- Educational resource connections "
-                "- Simple scheduling tasks "
-                "For any of these situations, you must use the send_email function to escalate to human support: "
-                "1. When users request to speak with a human directly "
-                "2. When medical or clinical questions are asked that require healthcare provider input "
-                "3. When users express dissatisfaction with your responses "
-                "4. When you cannot find the necessary information to help them "
-                "5. When users need specific personal health advice "
-                "When escalating, remain warm and professional, explaining that you're connecting them with the appropriate team member. "
-                "For non-ADHD questions, gently redirect to ADHD-related support while maintaining a helpful tone. "
-                "Always use natural, clear speech patterns suitable for audio conversion. "
-                "Avoid technical formatting and special characters."
-                "Before escalating to human support, follow these exact steps while maintaining a natural conversation:"
-                "1. Name Collection and Verification:"
-                "   - Ask for their name"
-                "   - MUST spell it back to them exactly and get explicit confirmation"
-                "   - If spelling is incorrect, ask again"
-                "   - If they decline to provide name, acknowledge and note that"
-                "2. Schedule Collection and Validation:"
-                "   - Ask when they'd like to be contacted"
-                "   - MUST use check_schedule function to validate their preferred time before proceeding"
-                "   - If check_schedule returns invalid:"
-                "     * Explain the specific reasons to the customer"
-                "     * Ask for an alternative time"
-                "     * Validate new time with check_schedule again"
-                "   - If they don't want to specify a time, acknowledge and note that"
-                "Only use send_email_with_info after completing these verifications. Never include unverified names or "
-                "unvalidated schedules in the email."
-                "When using send_email_with_info:"
-                "- Include their name (or note if declined)"
-                "- Include their preferred schedule (or note if no preference given)"
-                "- Maintain a natural, conversational tone throughout"
-                "\n\n" + text
-            ),
-        }
-    ]
+        tts = CartesiaTTSService(
+            api_key=os.getenv("CARTESIA_API_KEY"),
+            voice_id="79a125e8-cd45-4c13-8a67-188112f4dd22",  # British Lady
+            text_filter=MarkdownTextFilter(),
+            # push_silence_after_stop=testing,
+        )
 
-      context = OpenAILLMContext(messages, tools)
-      context_aggregator = llm.create_context_aggregator(context)
-      transcript = TranscriptProcessor()
-      transcript_handler = TranscriptHandler()
-      audiobuffer = AudioBufferProcessor(user_continuous_stream=False)
-      logger.info("AudioBufferProcessor initialized")
-     
-
-      pipeline = Pipeline(
-        [
-            transport.input(),  # Websocket input from client
-            stt,  # Speech-To-Text
-            transcript.user(),
-            context_aggregator.user(),
-            llm,  # LLM
-            tts,  # Text-To-Speech
-            transport.output(),  
-            audiobuffer,
-            transcript.assistant(),
-            context_aggregator.assistant(),
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a helpful assistant named Jessica at CARE ADHD. "
+                    f"Today's date is {date_time_now}"
+                    "Your output will be converted to audio, so avoid using special characters in your answers. "
+                    "Keep responses brief and conversational as they will be heard, not read. "
+                    "You should be warm and supportive while maintaining professional boundaries. "
+                    "You can assist with: "
+                    "- General information about ADHD support programs "
+                    "- Basic service inquiries "
+                    "- Educational resource connections "
+                    "- Simple scheduling tasks "
+                    "For any of these situations, you must use the send_email function to escalate to human support: "
+                    "1. When users request to speak with a human directly "
+                    "2. When medical or clinical questions are asked that require healthcare provider input "
+                    "3. When users express dissatisfaction with your responses "
+                    "4. When you cannot find the necessary information to help them "
+                    "5. When users need specific personal health advice "
+                    "When escalating, remain warm and professional, explaining that you're connecting them with the appropriate team member. "
+                    "For non-ADHD questions, gently redirect to ADHD-related support while maintaining a helpful tone. "
+                    "Always use natural, clear speech patterns suitable for audio conversion. "
+                    "Avoid technical formatting and special characters."
+                    "Before escalating to human support, follow these exact steps while maintaining a natural conversation:"
+                    "1. Name Collection and Verification:"
+                    "   - Ask for their name"
+                    "   - MUST spell it back to them exactly and get explicit confirmation"
+                    "   - If spelling is incorrect, ask again"
+                    "   - If they decline to provide name, acknowledge and note that"
+                    "2. Schedule Collection and Validation:"
+                    "   - Ask when they'd like to be contacted"
+                    "   - MUST use check_schedule function to validate their preferred time before proceeding"
+                    "   - If check_schedule returns invalid:"
+                    "     * Explain the specific reasons to the customer"
+                    "     * Ask for an alternative time"
+                    "     * Validate new time with check_schedule again"
+                    "   - If they don't want to specify a time, acknowledge and note that"
+                    "Only use send_email_with_info after completing these verifications. Never include unverified names or "
+                    "unvalidated schedules in the email."
+                    "When using send_email_with_info:"
+                    "- Include their name (or note if declined)"
+                    "- Include their preferred schedule (or note if no preference given)"
+                    "- Maintain a natural, conversational tone throughout"
+                    "\n\n" + text
+                ),
+            }
         ]
-    )
 
-      task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=False,enable_metrics=True,))
-      s3_url_future = asyncio.Future()
-      @audiobuffer.event_handler("on_audio_data")
-      async def on_audio_data(buffer, audio, sample_rate, num_channels):
-        try:
-          s3_url = await save_audio_to_s3(
-             audio=audio,
-             sample_rate=sample_rate,
-             num_channels=num_channels,
-             bucket_name="careadhdaudio"
-          )
-          logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
-          if not s3_url_future.done():
-              s3_url_future.set_result(s3_url)
-        except Exception as e:
-          logger.error(f"Error saving audio to S3: {e}")
-          if not s3_url_future.done():
-              s3_url_future.set_exception(e)
+        context = OpenAILLMContext(messages, tools)
+        context_aggregator = llm.create_context_aggregator(context)
+        transcript = TranscriptProcessor()
+        transcript_handler = TranscriptHandler()
+        audiobuffer = AudioBufferProcessor(user_continuous_stream=False)
+        logger.info("AudioBufferProcessor initialized")
 
-              
-
-      @transcript.event_handler("on_transcript_update")
-      async def on_transcript_update(processor, frame):
-        await transcript_handler.on_transcript_update(processor, frame)
-
-      @transport.event_handler("on_client_connected")
-      async def on_client_connected(transport, client):
-        """
-        # Kick off the conversation.
-        messages.append(
-            {"role": "system", "content": "Please introduce yourself to the user."}
+        pipeline = Pipeline(
+            [
+                transport.input(),  # Websocket input from client
+                stt,  # Speech-To-Text
+                transcript.user(),
+                context_aggregator.user(),
+                llm,  # LLM
+                tts,  # Text-To-Speech
+                transport.output(),
+                audiobuffer,
+                transcript.assistant(),
+                context_aggregator.assistant(),
+            ]
         )
-        await task.queue_frames([LLMMessagesFrame(messages)])
-        """
-        await tts.say("Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? ")
-        logger.info("Starting audio recording")
-        await audiobuffer.start_recording()
-        logger.info("Audio recording started successfully")
 
-      @transport.event_handler("on_client_disconnected")
-      async def on_client_disconnected(transport, client):
-        logger.info("Call ended. Conversation history:")
-        # Get transcript data from the handler
-        transcript_data = transcript_handler.get_transcript()
-        conversation_messages = transcript_data["messages"]
-
-        conversation_json = json.dumps(
-            conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
+        task = PipelineTask(
+            pipeline,
+            params=PipelineParams(
+                allow_interruptions=False,
+                enable_metrics=True,
+            ),
         )
-        logger.info(conversation_json)
-        try:
-            # Wait for 10 seconds maximum for the S3 URL
-            s3_url = await asyncio.wait_for(s3_url_future, timeout=10.0)
-        except (asyncio.TimeoutError, Exception) as e:
-            logger.error(f"Error getting S3 URL: {e}")
-            s3_url = "not available - timed out or error occurred"
+        s3_url_future = asyncio.Future()
 
-        current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        email_subject = f"Call Transcript - {current_datetime}"
+        @audiobuffer.event_handler("on_audio_data")
+        async def on_audio_data(buffer, audio, sample_rate, num_channels):
+            try:
+                s3_url = await save_audio_to_s3(
+                    audio=audio,
+                    sample_rate=sample_rate,
+                    num_channels=num_channels,
+                    bucket_name="careadhdaudio",
+                )
+                logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
+                if not s3_url_future.done():
+                    s3_url_future.set_result(s3_url)
+            except Exception as e:
+                logger.error(f"Error saving audio to S3: {e}")
+                if not s3_url_future.done():
+                    s3_url_future.set_exception(e)
 
-        # Format the transcript messages for email
-        formatted_messages = []
-        for msg in conversation_messages:
-            timestamp = f"[{msg['timestamp']}] " if msg["timestamp"] else ""
-            formatted_messages.append(f"{timestamp}{msg['role']}: {msg['content']}")
+        @transcript.event_handler("on_transcript_update")
+        async def on_transcript_update(processor, frame):
+            await transcript_handler.on_transcript_update(processor, frame)
 
-        formatted_transcript = "\n".join(formatted_messages)
-        call_details = get_call_details(call_sid)
-        formatted_call_details = f"""
+        @transport.event_handler("on_client_connected")
+        async def on_client_connected(transport, client):
+            """
+            # Kick off the conversation.
+            messages.append(
+                {"role": "system", "content": "Please introduce yourself to the user."}
+            )
+            await task.queue_frames([LLMMessagesFrame(messages)])
+            """
+            await tts.say(
+                "Hi, I am Jessicca from CARE A.D.H.D. ---How can i help you ?? "
+            )
+            logger.info("Starting audio recording")
+            await audiobuffer.start_recording()
+            logger.info("Audio recording started successfully")
+
+        @transport.event_handler("on_client_disconnected")
+        async def on_client_disconnected(transport, client):
+            logger.info("Call ended. Conversation history:")
+            # Get transcript data from the handler
+            transcript_data = transcript_handler.get_transcript()
+            conversation_messages = transcript_data["messages"]
+
+            conversation_json = json.dumps(
+                conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
+            )
+            logger.info(conversation_json)
+            try:
+                # Wait for 10 seconds maximum for the S3 URL
+                s3_url = await asyncio.wait_for(s3_url_future, timeout=10.0)
+            except (asyncio.TimeoutError, Exception) as e:
+                logger.error(f"Error getting S3 URL: {e}")
+                s3_url = "not available - timed out or error occurred"
+
+            current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            email_subject = f"Call Transcript - {current_datetime}"
+
+            # Format the transcript messages for email
+            formatted_messages = []
+            for msg in conversation_messages:
+                timestamp = f"[{msg['timestamp']}] " if msg["timestamp"] else ""
+                formatted_messages.append(f"{timestamp}{msg['role']}: {msg['content']}")
+
+            formatted_transcript = "\n".join(formatted_messages)
+            call_details = get_call_details(call_sid)
+            formatted_call_details = f"""
             Call Details:
             -------------
             From: {call_details['phone_number']}
@@ -400,7 +390,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             Recording_url:{s3_url}
             """
 
-        email_body = f"""
+            email_body = f"""
         Hello,
 
         This is a transcript of a real call between Jessica and a user.
@@ -415,10 +405,10 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         Jessica AI Team
         """
 
-        # Send the transcript via email
-        send_email(email_subject, email_body)
-        await task.queue_frames([EndFrame()])
+            # Send the transcript via email
+            send_email(email_subject, email_body)
+            await task.queue_frames([EndFrame()])
 
-      runner = PipelineRunner(handle_sigint=False)
+        runner = PipelineRunner(handle_sigint=False)
 
-      await runner.run(task)
+        await runner.run(task)
