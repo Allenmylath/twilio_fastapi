@@ -353,9 +353,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
       @transport.event_handler("on_client_disconnected")
       async def on_client_disconnected(transport, client):
         logger.info("Call ended. Conversation history:")
-        logger.info("Call ended. Beginning audio recording shutdown")
-        await audiobuffer.stop_recording()
-        logger.info("Audio recording stopped successfully")
         audio, sample_rate, num_channels = audiobuffer.get_audio()
         logger.info(f"Audio data received: {len(audio)} bytes, sample_rate={sample_rate}, channels={num_channels}")
         try:
