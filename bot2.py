@@ -45,7 +45,7 @@ from audio_s3 import save_audio_to_s3
 
 from twilio_helper import get_call_details
 
-from text import text
+from text2 import text
 
 from loguru import logger
 
