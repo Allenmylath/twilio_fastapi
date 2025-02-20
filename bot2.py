@@ -318,7 +318,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
     )
 
       task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=False,enable_metrics=True,))
-      s3_url="not available"
+      s3_url_future = asyncio.Future()
       @audiobuffer.event_handler("on_audio_data")
       async def on_audio_data(buffer, audio, sample_rate, num_channels):
         try:
@@ -329,8 +329,12 @@ async def run_bot(websocket_client, stream_sid, call_sid):
              bucket_name="careadhdaudio"
           )
           logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
+          if not s3_url_future.done():
+              s3_url_future.set_result(s3_url)
         except Exception as e:
           logger.error(f"Error saving audio to S3: {e}")
+          if not s3_url_future.done():
+              s3_url_future.set_exception(e)
 
               
 
@@ -363,6 +367,12 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
         )
         logger.info(conversation_json)
+        try:
+            # Wait for 10 seconds maximum for the S3 URL
+            s3_url = await asyncio.wait_for(s3_url_future, timeout=10.0)
+        except (asyncio.TimeoutError, Exception) as e:
+            logger.error(f"Error getting S3 URL: {e}")
+            s3_url = "not available - timed out or error occurred"
 
         current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         email_subject = f"Call Transcript - {current_datetime}"
