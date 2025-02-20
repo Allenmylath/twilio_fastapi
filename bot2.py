@@ -358,8 +358,8 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             )
             logger.info(conversation_json)
             try:
-                # Wait for 10 seconds maximum for the S3 URL
-                s3_url = await asyncio.wait_for(s3_url_future, timeout=10.0)
+                
+                s3_url = await asyncio.wait_for(s3_url_future, timeout=20.0)
             except (asyncio.TimeoutError, Exception) as e:
                 logger.error(f"Error getting S3 URL: {e}")
                 s3_url = "not available - timed out or error occurred"
