@@ -18,6 +18,7 @@ from pipecat.services.cartesia import CartesiaTTSService
 from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
 from pipecat.processors.aggregators.openai_llm_context import CustomEncoder
 from pipecat.processors.audio.vad.silero import SileroVAD
+from pipecat.processors.user_idle_processor import UserIdleProcessor
 from Audiobufferprocessor import AudioBufferProcessor
 from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
