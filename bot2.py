@@ -45,6 +45,7 @@ from transcription import TranscriptHandler
 from audio_s3 import save_audio_to_s3
 
 from twilio_helper import get_call_details
+from user_idle_check import handle_user_idle
 
 from text2 import text
 
@@ -285,10 +286,16 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         transcript_handler = TranscriptHandler()
         audiobuffer = AudioBufferProcessor(user_continuous_stream=False)
         logger.info("AudioBufferProcessor initialized")
+        async def idle_handler(user_idle: UserIdleProcessor, retry_count: int) -> bool:
+            return await handle_user_idle(user_idle, retry_count, messages, task)
+
+        user_idle = UserIdleProcessor(callback=idle_handler, timeout=5.0)
+
 
         pipeline = Pipeline(
             [
-                transport.input(),  # Websocket input from client
+                transport.input(),  
+                user_idle,
                 stt,  # Speech-To-Text
                 transcript.user(),
                 context_aggregator.user(),
