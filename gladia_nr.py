@@ -246,7 +246,9 @@ class GladiaSTTService(STTService):
                             "value": "0204 525 0709",
                             "pronunciations": ["oh two oh four five two five oh seven oh nine"],
                             "intensity": 0.9
-		                }
+			},
+			]
+		},	
             },
         }
         self._confidence = confidence
