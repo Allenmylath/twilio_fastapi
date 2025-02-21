@@ -174,6 +174,79 @@ class GladiaSTTService(STTService):
             },
             "realtime_processing": {
                 "words_accurate_timestamps": params.words_accurate_timestamps,
+                "custom_vocabulary": True,
+                "custom_vocabulary_config": {
+	                "vocabulary": [
+                    # General Appointment Terms
+                        {"value": "book", "intensity": 0.7},
+                        {"value": "appointment", "intensity": 0.8},
+                        {"value": "schedule", "intensity": 0.7},
+                        {"value": "availability", "intensity": 0.7},
+                        {"value": "duration", "intensity": 0.6},
+                        {"value": "reminder", "intensity": 0.6},
+                        {"value": "confirmation", "intensity": 0.7},
+                        {"value": "reschedule", "intensity": 0.8},
+                        {"value": "cancel", "intensity": 0.8},
+                        {"value": "missed", "intensity": 0.7},
+                
+                        # Date and Time Terms
+                        {"value": "Monday", "intensity": 0.8},
+                        {"value": "Tuesday", "intensity": 0.8},
+                        {"value": "Wednesday", "intensity": 0.8},
+                        {"value": "Thursday", "intensity": 0.8},
+                        {"value": "Friday", "intensity": 0.8},
+                        {"value": "January", "intensity": 0.8},
+                        {"value": "February", "intensity": 0.8},
+                        {"value": "March", "intensity": 0.8},
+                        {"value": "April", "intensity": 0.8},
+                        {"value": "May", "intensity": 0.8},
+                        {"value": "June", "intensity": 0.8},
+                        {"value": "July", "intensity": 0.8},
+                        {"value": "August", "intensity": 0.8},
+                        {"value": "September", "intensity": 0.8},
+                        {"value": "October", "intensity": 0.8},
+                        {"value": "November", "intensity": 0.8},
+                        {"value": "December", "intensity": 0.8},
+                        {"value": "next week", "intensity": 0.7},
+                        {"value": "this week", "intensity": 0.7},
+                        {"value": "tomorrow", "intensity": 0.8},
+                
+                        # CARE ADHD Specific Terms
+                        {
+                            "value": "CARE ADHD",
+                            "pronunciations": ["care ay dee aych dee", "care ey dee eych dee"],
+                            "intensity": 0.9
+                        },
+                        {
+                            "value": "ADHD",
+                            "pronunciations": ["ay dee aych dee", "ey dee eych dee"],
+                            "intensity": 0.9
+                        },
+                        {"value": "virtual assessment", "intensity": 0.8},
+                        {"value": "follow-up", "intensity": 0.8},
+                        {"value": "waiting times", "intensity": 0.7},
+                        {"value": "processing time", "intensity": 0.7},
+                        {"value": "rebooking fee", "intensity": 0.8},
+                        {"value": "missed appointment", "intensity": 0.8},
+                
+                        # Service-Specific Terms
+                        {"value": "assessment", "intensity": 0.8},
+                        {"value": "medication", "intensity": 0.8},
+                        {"value": "management", "intensity": 0.7},
+                        {
+                            "value": "CBT",
+                            "pronunciations": ["see bee tee"],
+                            "intensity": 0.8
+                        },
+                        {"value": "titration", "intensity": 0.8},
+                        {"value": "cognitive behavioral therapy", "intensity": 0.8},
+                
+                        # Contact Information
+                        {
+                            "value": "0204 525 0709",
+                            "pronunciations": ["oh two oh four five two five oh seven oh nine"],
+                            "intensity": 0.9
+		                }
             },
         }
         self._confidence = confidence
