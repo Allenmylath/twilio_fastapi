@@ -317,7 +317,7 @@ class GladiaSTTService(STTService):
             n_fft=512,              # ~32ms at 16kHz - slightly larger than frame for better frequency resolution
             win_length=400,         # ~25ms - slightly larger than your frame size
             hop_length=160,         # 10ms (50% overlap with 20ms frames)
-            thresh_n_mult_nonstat=1.3  # Moderate threshold to preserve speech characteristics
+            #thresh_n_mult_nonstat=1.3  # Moderate threshold to preserve speech characteristics
         )
         
         # Convert back to int16 audio bytes, clipping to prevent overflow
