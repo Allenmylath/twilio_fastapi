@@ -291,6 +291,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             return await handle_user_idle(user_idle, retry_count, messages, task)
 
         user_idle = UserIdleProcessor(callback=idle_handler, timeout=10.0)
+        t_filter = TranscriptionAggregator()
 
 
         pipeline = Pipeline(
@@ -298,7 +299,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 transport.input(),  
                 user_idle,
                 stt,  # Speech-To-Text
-                TranscriptionAggregator,
+                t_filter,
                 transcript.user(),
                 context_aggregator.user(),
                 llm,  # LLM
