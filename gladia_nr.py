@@ -247,6 +247,19 @@ class GladiaSTTService(STTService):
                             "pronunciations": ["oh two oh four five two five oh seven oh nine"],
                             "intensity": 0.9
 			},
+			{
+                            "value": "thank you",
+                            "pronunciations": [
+                            "thank you",
+                            "thaenk yoo",
+                            "thank yu",
+                            "thank yew",
+                            "thankyew",
+                            "thank-you",
+                            "thankya"
+                            ],
+                            "intensity": 0.5
+                        }
 			]
 		},	
             },
