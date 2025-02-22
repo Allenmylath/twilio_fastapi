@@ -46,7 +46,7 @@ from audio_s3 import save_audio_to_s3
 
 from twilio_helper import get_call_details
 from user_idle_check import handle_user_idle
-from transcription_filter import TranscriptionAggregator
+
 
 from text2 import text
 
@@ -291,7 +291,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             return await handle_user_idle(user_idle, retry_count, messages, task)
 
         user_idle = UserIdleProcessor(callback=idle_handler, timeout=10.0)
-        t_filter = TranscriptionAggregator()
+        
 
 
         pipeline = Pipeline(
@@ -299,7 +299,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 transport.input(),  
                 user_idle,
                 stt,  # Speech-To-Text
-                t_filter,
                 transcript.user(),
                 context_aggregator.user(),
                 llm,  # LLM
