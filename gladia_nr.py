@@ -341,7 +341,9 @@ class GladiaSTTService(STTService):
                         await self.push_frame(
                             TranscriptionFrame(transcript, "", time_now_iso8601())
                         )
-                    else:
+                    """
+		    else:
                         await self.push_frame(
                             InterimTranscriptionFrame(transcript, "", time_now_iso8601())
                         )
+		     """	
