@@ -289,7 +289,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         async def idle_handler(user_idle: UserIdleProcessor, retry_count: int) -> bool:
             return await handle_user_idle(user_idle, retry_count, messages, task)
 
-        user_idle = UserIdleProcessor(callback=idle_handler, timeout=5.0)
+        user_idle = UserIdleProcessor(callback=idle_handler, timeout=10.0)
 
 
         pipeline = Pipeline(
@@ -367,7 +367,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             logger.info(conversation_json)
             try:
                 
-                s3_url = await asyncio.wait_for(s3_url_future, timeout=20.0)
+                s3_url = await asyncio.wait_for(s3_url_future, timeout=9.0)
             except (asyncio.TimeoutError, Exception) as e:
                 logger.error(f"Error getting S3 URL: {e}")
                 s3_url = "not available - timed out or error occurred"
