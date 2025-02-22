@@ -1,14 +1,13 @@
 from loguru import logger
 from typing import List, Optional
 from dataclasses import dataclass
+from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
 from pipecat.frames.frames import (
     Frame,
     TranscriptionFrame,
     UserStartedSpeakingFrame,
     UserStoppedSpeakingFrame,
-    FrameProcessor,
-    FrameDirection
 )
 
 @dataclass
