@@ -310,8 +310,6 @@ class GladiaSTTService(STTService):
 
     async def _send_audio(self, audio: bytes):
         
-        Override of the parent's _send_audio method to add noise reduction.
-        Uses a simplified approach to reduce noise from the audio data.
      
         # Convert bytes to numpy array
         data = np.frombuffer(audio, dtype=np.int16)
