@@ -343,24 +343,19 @@ class GladiaSTTService(STTService):
                    "type": "audio_chunk", 
                    "data": {
                             "chunk": data,
-                            "sample_rate": 16000  # Add this field
+                            
                            }
                   }
 
-await self._websocket.send(json.dumps(message))
-Then the receiver would need to:
-
-Decode the base64 back to bytes
-Use the provided sample rate to correctly interpret/play the audio
-Without knowing the correct sample rate, the receiver might play the audio too fast or too slow, resulting in distorted sound.
+         await self._websocket.send(json.dumps(message))
 
 
 
 
-Retry
-Claude can make mistakes. Please double-check responses.
+
+
 	
-        await self._websocket.send(json.dumps(message))
+        
         
     async def _send_stop_recording(self):
         await self._websocket.send(json.dumps({"type": "stop_recording"}))
