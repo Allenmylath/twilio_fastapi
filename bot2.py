@@ -25,6 +25,7 @@ from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from gladia_nr import GladiaSTTService
 from stt_mute_filter import STTMuteConfig, STTMuteFilter, STTMuteStrategy
+from pipecat.sync.event_notifier import EventNotifier
 
 
 from pipecat.services.openai import OpenAILLMService
