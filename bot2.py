@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
-from pipecat.frames.frames import EndFrame, LLMMessagesFrame
+from pipecat.frames.frames import EndFrame, LLMMessagesFrame, UserStoppedSpeakingFrame
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineParams, PipelineTask
