@@ -23,7 +23,7 @@ from Audiobufferprocessor import AudioBufferProcessor
 from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from gladia_nr import GladiaSTTService
-from stt_mute_filter import STTMuteFilter
+from stt_mute_filter import STTMuteConfig, STTMuteFilter, STTMuteStrategy
 
 
 from pipecat.services.openai import OpenAILLMService
