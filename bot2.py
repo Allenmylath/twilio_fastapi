@@ -23,6 +23,7 @@ from pipecat.processors.user_idle_processor import UserIdleProcessor
 from Audiobufferprocessor import AudioBufferProcessor
 from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
+from pipecat.processors.filters.wake_notifier_filter import WakeNotifierFilter
 from gladia_nr import GladiaSTTService
 from stt_mute_filter import STTMuteConfig, STTMuteFilter, STTMuteStrategy
 from pipecat.sync.event_notifier import EventNotifier
@@ -243,6 +244,9 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         )
         gated_context_aggregator = GatedOpenAILLMContextAggregator(
             notifier=notifier, start_open=True
+        )
+        completness_check = WakeNotifierFilter(
+            notifier, types=(TextFrame,), filter=wake_check_filter
         )
 
         messages = [
