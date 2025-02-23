@@ -246,7 +246,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             notifier=notifier, start_open=True
         )
         completness_check = WakeNotifierFilter(
-            notifier, types=(TextFrame,), filter=wake_check_filter
+            notifier, types=(UserStoppedSpeakingFrame,), filter=wake_check_filter
         )
 
         messages = [
