@@ -158,7 +158,7 @@ class GladiaSTTService(STTService):
         self._settings = {
             "encoding": "wav/pcm",
             "bit_depth": 16,
-            "sample_rate": 0,
+            "sample_rate": 16000,
             "channels": 1,
             "language_config": {
                 "languages": [self.language_to_service_language(params.language)]
