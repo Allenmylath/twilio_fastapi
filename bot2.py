@@ -398,7 +398,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             logger.info(conversation_json)
             try:
                 
-                s3_url = await asyncio.wait_for(s3_url_future, timeout=9.0)
+                s3_url = await asyncio.wait_for(s3_url_future, timeout=1)
             except (asyncio.TimeoutError, Exception) as e:
                 logger.error(f"Error getting S3 URL: {e}")
                 s3_url = "not available - timed out or error occurred"
