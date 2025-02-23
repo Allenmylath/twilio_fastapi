@@ -241,6 +241,9 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             text_filter=MarkdownTextFilter(),
             # push_silence_after_stop=testing,
         )
+        gated_context_aggregator = GatedOpenAILLMContextAggregator(
+            notifier=notifier, start_open=True
+        )
 
         messages = [
             {
@@ -293,6 +296,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
         context = OpenAILLMContext(messages, tools)
         context_aggregator = llm.create_context_aggregator(context)
+        notifier = EventNotifier()
         transcript = TranscriptProcessor()
         transcript_handler = TranscriptHandler()
         audiobuffer = AudioBufferProcessor(user_continuous_stream=False)
