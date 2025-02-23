@@ -448,6 +448,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             send_email(email_subject, email_body)
             await task.queue_frames([EndFrame()])
 
-        runner = PipelineRunner(handle_sigint=False)
+        runner = PipelineRunner(handle_sigint=False, force_gc=True)
 
         await runner.run(task)
