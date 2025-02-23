@@ -316,6 +316,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 stt,  # Speech-To-Text
                 transcript.user(),
                 context_aggregator.user(),
+                gated_context_aggregator,
                 llm,  # LLM
                 tts,  # Text-To-Speech
                 transport.output(),
