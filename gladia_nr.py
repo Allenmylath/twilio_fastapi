@@ -346,16 +346,7 @@ class GladiaSTTService(STTService):
                             
                            }
                   }
-
-         await self._websocket.send(json.dumps(message))
-
-
-
-
-
-
-	
-        
+        await self._websocket.send(json.dumps(message))        
         
     async def _send_stop_recording(self):
         await self._websocket.send(json.dumps({"type": "stop_recording"}))
