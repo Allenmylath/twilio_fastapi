@@ -65,6 +65,10 @@ logger.add(sys.stderr, level="DEBUG")
 
 date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %A %H:%M:%S")
 
+async def wake_check_filter(frame):
+    asynio.sleep(.5)
+    return True
+
 
 async def validate_schedule(date_str: str, time_str: str) -> Dict[str, Any]:
     """
