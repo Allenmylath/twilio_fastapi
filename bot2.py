@@ -23,6 +23,7 @@ from Audiobufferprocessor import AudioBufferProcessor
 from openai.types.chat import ChatCompletionToolParam
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from gladia_nr import GladiaSTTService
+from stt_mute_filter import STTMuteFilter
 
 
 from pipecat.services.openai import OpenAILLMService
@@ -223,6 +224,14 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             audio_enhancer=True,
             audio_passthrough=True,
         )
+        stt_mute_processor = STTMuteFilter(
+            config=STTMuteConfig(
+                strategies={
+                    STTMuteStrategy.MUTE_UNTIL_FIRST_BOT_COMPLETE,
+                    STTMuteStrategy.FUNCTION_CALL,
+                }
+            ),
+        )
 
         tts = CartesiaTTSService(
             api_key=os.getenv("CARTESIA_API_KEY"),
@@ -297,6 +306,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             [
                 transport.input(),  
                 user_idle,
+                stt_mute_processor,
                 stt,  # Speech-To-Text
                 transcript.user(),
                 context_aggregator.user(),
