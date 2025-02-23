@@ -238,7 +238,10 @@ class GladiaSTTService(STTService):
                             "pronunciations": ["see bee tee"],
                             "intensity": 0.8
                         },
-                        {"value": "titration", "intensity": 0.8},
+                        {"value": "titration",
+			 "pronunciations": ["tai tra shun, hi dre shun,tai tre shun,tei tra shun,toi tra shun"],
+			 "intensity": 0.8},
+				
                         {"value": "cognitive behavioral therapy", "intensity": 0.8},
                 
                         # Contact Information
