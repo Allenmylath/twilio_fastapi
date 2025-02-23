@@ -313,7 +313,7 @@ class GladiaSTTService(STTService):
 
     async def _send_audio(self, audio: bytes):
         
-     
+        """
         # Convert bytes to numpy array
         data = np.frombuffer(audio, dtype=np.int16)
         
@@ -338,10 +338,10 @@ class GladiaSTTService(STTService):
         
         # Convert back to int16 audio bytes, clipping to prevent overflow
         processed_audio = np.clip(reduced_noise, -32768, 32767).astype(np.int16).tobytes()
-	
+	"""
         
         # Encode and send as in the parent class
-        data = base64.b64encode(processed_audio).decode("utf-8")
+        data = base64.b64encode(audio).decode("utf-8")
         message = {
                    "type": "audio_chunk", 
                    "data": {
