@@ -227,7 +227,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         stt_mute_processor = STTMuteFilter(
             config=STTMuteConfig(
                 strategies={
-                    STTMuteStrategy.MUTE_UNTIL_FIRST_BOT_COMPLETE,
+                    #STTMuteStrategy.MUTE_UNTIL_FIRST_BOT_COMPLETE,
                     STTMuteStrategy.FUNCTION_CALL,
                 }
             ),
