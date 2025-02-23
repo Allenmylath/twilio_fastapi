@@ -322,6 +322,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 user_idle,
                 stt_mute_processor,
                 stt,  # Speech-To-Text
+                completness_check,
                 transcript.user(),
                 context_aggregator.user(),
                 gated_context_aggregator,
