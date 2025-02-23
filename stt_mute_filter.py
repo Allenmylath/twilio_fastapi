@@ -183,13 +183,14 @@ class STTMuteFilter(FrameProcessor):
             should_mute = await self._should_mute()
 
         # Then push the original frame
+        
         if isinstance(
             frame,
             (
-                StartInterruptionFrame,
-                StopInterruptionFrame,
-                UserStartedSpeakingFrame,
-                UserStoppedSpeakingFrame,
+                #StartInterruptionFrame,
+                #StopInterruptionFrame,
+                #UserStartedSpeakingFrame,
+                #UserStoppedSpeakingFrame,
                 InputAudioRawFrame,
             ),
         ):
