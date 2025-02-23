@@ -9,7 +9,8 @@ from typing import Dict, Any
 
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
-from pipecat.frames.frames import EndFrame, LLMMessagesFrame, UserStoppedSpeakingFrame
+from pipecat.frames.frames import EndFrame, LLMMessagesFrame, UserStoppedSpeakingFrame,Frame, TranscriptionFrame
+from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineParams, PipelineTask
@@ -64,6 +65,13 @@ logger.add(sys.stderr, level="DEBUG")
 
 
 date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %A %H:%M:%S")
+
+class TranscriptionLogger(FrameProcessor):
+    async def process_frame(self, frame: Frame, direction: FrameDirection):
+        await super().process_frame(frame, direction)
+
+        if isinstance(frame, TranscriptionFrame):
+            print(f"Transcription: {frame.text}")
 
 async def wake_check_filter(frame):
     await asyncio.sleep(.5)
@@ -253,6 +261,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         completness_check = WakeNotifierFilter(
             notifier, types=(UserStoppedSpeakingFrame,), filter=wake_check_filter
         )
+        tl = TranscriptionLogger()
 
         messages = [
             {
@@ -322,6 +331,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 user_idle,
                 stt_mute_processor,
                 stt,  # Speech-To-Text
+                tl,
                 completness_check,
                 transcript.user(),
                 context_aggregator.user(),
