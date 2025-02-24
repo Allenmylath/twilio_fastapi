@@ -239,7 +239,7 @@ class GladiaSTTService(STTService):
                             "intensity": 0.8
                         },
                         {"value": "titration",
-			 "pronunciations": ["tai tra shun, hi dre shun,tai tre shun,tei tra shun,toi tra shun"],
+			 "pronunciations": ["tai tra shun, hi dre shun,tai tre shun,tei tra shun,toi tra shun, type va shun"],
 			 "intensity": 0.8},
 				
                         {"value": "cognitive behavioral therapy", "intensity": 0.8},
