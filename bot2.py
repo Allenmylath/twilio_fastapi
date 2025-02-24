@@ -342,7 +342,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         task = PipelineTask(
             pipeline,
             params=PipelineParams(
-                allow_interruptions=False,
+                allow_interruptions=True,
                 enable_metrics=True,
             ),
         )
