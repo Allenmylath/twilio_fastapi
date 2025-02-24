@@ -395,6 +395,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             conversation_json = json.dumps(
                 conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
             )
+            await task.queue_frames([EndFrame()])
             logger.info(conversation_json)
             try:
                 
@@ -446,7 +447,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
             # Send the transcript via email
             send_email(email_subject, email_body)
-            await task.queue_frames([EndFrame()])
+            
 
         runner = PipelineRunner(handle_sigint=False, force_gc=True)
 
