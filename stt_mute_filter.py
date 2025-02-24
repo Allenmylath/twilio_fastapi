@@ -163,10 +163,12 @@ class STTMuteFilter(FrameProcessor):
         # Process frames to determine mute state
         if isinstance(frame, StartFrame):
             should_mute = await self._should_mute()
+        """
         elif isinstance(frame, UserStartedSpeakingFrame):
             await self._handle_mute_state(False)
         elif isinstance(frame, UserStoppedSpeakingFrame):
             await self._handle_mute_state(True)
+        """
         elif isinstance(frame, FunctionCallInProgressFrame):
             self._function_call_in_progress = True
             should_mute = await self._should_mute()
@@ -187,10 +189,10 @@ class STTMuteFilter(FrameProcessor):
         if isinstance(
             frame,
             (
-                #StartInterruptionFrame,
-                #StopInterruptionFrame,
-                #UserStartedSpeakingFrame,
-                #UserStoppedSpeakingFrame,
+                StartInterruptionFrame,
+                StopInterruptionFrame,
+                UserStartedSpeakingFrame,
+                UserStoppedSpeakingFrame,
                 InputAudioRawFrame,
             ),
         ):
