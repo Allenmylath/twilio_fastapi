@@ -313,7 +313,7 @@ class GladiaSTTService(STTService):
 
     async def _send_audio(self, audio: bytes):
         
-        """
+        
         # Convert bytes to numpy array
         data = np.frombuffer(audio, dtype=np.int16)
         
@@ -326,19 +326,16 @@ class GladiaSTTService(STTService):
         reduced_noise = nr.reduce_noise(
             y=data,
             sr=16000,
-            prop_decrease=0.85,  # Increased from 0.75 to be more aggressive with noise reduction
-            n_fft=2048,         # Increased FFT size for better low-frequency resolution
-            win_length=2048,    # Match window length to n_fft
-            hop_length=512,     # 75% overlap between windows
-            stationary=False,   # Keep as False since background noise might vary
-            n_std_thresh_stationary=2.5,
-            thresh_n_mult_nonstationary=2.5,  # Slightly more aggressive threshold
-            n_jobs=-1          # Use all available CPU cores for faster processing
-        )
+         )
+	 # Normalize the audio to use full dynamic range
+        if reduced_noise.max() > 0:
+            normalized_audio = reduced_noise * (32767 / max(abs(reduced_noise.max()), abs(reduced_noise.min())))
+        else:
+            normalized_audio = reduced_noise
         
         # Convert back to int16 audio bytes, clipping to prevent overflow
         processed_audio = np.clip(reduced_noise, -32768, 32767).astype(np.int16).tobytes()
-	"""
+	
         
         # Encode and send as in the parent class
         data = base64.b64encode(audio).decode("utf-8")
