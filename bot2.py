@@ -23,6 +23,7 @@ from pipecat.processors.audio.vad.silero import SileroVAD
 from pipecat.processors.user_idle_processor import UserIdleProcessor
 from Audiobufferprocessor import AudioBufferProcessor
 from openai.types.chat import ChatCompletionToolParam
+from pipecat.processors.logger import FrameLogger
 from pipecat.processors.transcript_processor import TranscriptProcessor
 from pipecat.processors.filters.wake_notifier_filter import WakeNotifierFilter
 from gladia_nr import GladiaSTTService
@@ -256,7 +257,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
         completness_check = WakeNotifierFilter(
             notifier, types=(UserStoppedSpeakingFrame,), filter=wake_check_filter
         )
-        
+        fl = FrameLogger(prefix="jessica_frames", color="red")
 
         messages = [
             {
@@ -329,6 +330,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 completness_check,
                 transcript.user(),
                 context_aggregator.user(),
+                fl,
                 gated_context_aggregator,
                 llm,  # LLM
                 tts,  # Text-To-Speech
