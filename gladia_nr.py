@@ -326,6 +326,7 @@ class GladiaSTTService(STTService):
         reduced_noise = nr.reduce_noise(
             y=data,
             sr=16000,
+	    prop_decrease=0.5,
          )
 	 # Normalize the audio to use full dynamic range
         if reduced_noise.max() > 0:
