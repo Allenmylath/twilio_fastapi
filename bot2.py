@@ -158,7 +158,7 @@ tools = [
                 "properties": {
                     "date": {
                         "type": "string",
-                        "description": "Date in YYYY-MM-DD format",
+                        "description": f"Date in YYYY-MM-DD format,Today's date is {date_time_now}",
                     },
                     "time": {
                         "type": "string",
