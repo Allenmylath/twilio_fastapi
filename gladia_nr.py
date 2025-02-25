@@ -338,7 +338,7 @@ class GladiaSTTService(STTService):
 	
         
         # Encode and send as in the parent class
-        data = base64.b64encode(audio).decode("utf-8")
+        data = base64.b64encode(procesed_audio).decode("utf-8")
         message = {
                    "type": "audio_chunk", 
                    "data": {
