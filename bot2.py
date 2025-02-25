@@ -439,7 +439,8 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
             # Send the transcript via email
             send_email(email_subject, email_body)
-            await task.queue_frames([EndFrame()])
+            #await task.queue_frames([EndFrame()])
+            await task.cancel()
             
 
         runner = PipelineRunner(handle_sigint=False, force_gc=True)
