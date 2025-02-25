@@ -346,7 +346,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 enable_metrics=True,
             ),
         )
-        s3_url_future = asyncio.Future()
+        
 
         @audiobuffer.event_handler("on_audio_data")
         async def on_audio_data(buffer, audio, sample_rate, num_channels):
@@ -358,12 +358,10 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                     bucket_name="careadhdaudio",
                 )
                 logger.info(f"Successfully saved {len(audio)} bytes of audio to S3")
-                if not s3_url_future.done():
-                    s3_url_future.set_result(s3_url)
+
             except Exception as e:
                 logger.error(f"Error saving audio to S3: {e}")
-                if not s3_url_future.done():
-                    s3_url_future.set_exception(e)
+
 
         @transcript.event_handler("on_transcript_update")
         async def on_transcript_update(processor, frame):
@@ -395,14 +393,9 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             conversation_json = json.dumps(
                 conversation_messages, cls=CustomEncoder, ensure_ascii=False, indent=2
             )
-            await task.queue_frames([EndFrame()])
+            
             logger.info(conversation_json)
-            try:
-                
-                s3_url = await asyncio.wait_for(s3_url_future, timeout=1)
-            except (asyncio.TimeoutError, Exception) as e:
-                logger.error(f"Error getting S3 URL: {e}")
-                s3_url = "not available - timed out or error occurred"
+
 
             current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             email_subject = f"Call Transcript - {current_datetime}"
@@ -427,7 +420,6 @@ async def run_bot(websocket_client, stream_sid, call_sid):
             End Time: {call_details['end_time']}
             Line Type: {call_details['line_type'].title()}
             Caller Name: {call_details['caller_name']}
-            Recording_url:{s3_url}
             """
 
             email_body = f"""
@@ -447,6 +439,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
 
             # Send the transcript via email
             send_email(email_subject, email_body)
+            await task.queue_frames([EndFrame()])
             
 
         runner = PipelineRunner(handle_sigint=False, force_gc=True)
