@@ -71,6 +71,7 @@ date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %A %H:%M:%S")
 
 async def wake_check_filter(frame):
     await asyncio.sleep(.5)
+    print("sleep time finished ")
     return True
 
 
