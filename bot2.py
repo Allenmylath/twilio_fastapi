@@ -212,7 +212,7 @@ async def run_bot(websocket_client, stream_sid, call_sid):
                 add_wav_header=False,
                 vad_enabled=True,
                 vad_audio_passthrough=True,
-                vad_analyzer=SileroVADAnalyzer(),
+                vad_analyzer=SileroVADAnalyzer(params=VADParams(stop_secs=1.5)),
                 serializer=TwilioFrameSerializer(stream_sid),
             ),
         )
