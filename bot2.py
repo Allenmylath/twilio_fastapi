@@ -29,6 +29,7 @@ from pipecat.processors.filters.wake_notifier_filter import WakeNotifierFilter
 from gladia_nr import GladiaSTTService
 from stt_mute_filter import STTMuteConfig, STTMuteFilter, STTMuteStrategy
 from pipecat.sync.event_notifier import EventNotifier
+from pipecat.audio.vad.vad_analyzer import VADParams
 
 
 from pipecat.services.openai import OpenAILLMService
